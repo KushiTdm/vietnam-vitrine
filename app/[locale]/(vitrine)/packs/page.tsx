@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   ENTERPRISE_FLOOR,
   MODIFICATIONS_NOTE,
@@ -12,7 +11,7 @@ import {
   publicDemosOf,
   formatVnd,
 } from "@/lib/registry";
-import { useLanguage } from "../components/LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "../components/LanguageProvider";
 import FeatureMatrix from "../components/FeatureMatrix";
 import PriceTag from "../components/PriceTag";
 import { PACK_VISUAL } from "../lib/pack-visuals";

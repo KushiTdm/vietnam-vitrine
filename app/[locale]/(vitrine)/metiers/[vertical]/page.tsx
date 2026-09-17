@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { use } from "react";
 import {
@@ -11,13 +10,17 @@ import {
   getVertical,
   type PackId,
 } from "@/lib/registry";
-import { useLanguage } from "../../components/LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "../../components/LanguageProvider";
 import DeviceFrame from "../../components/DeviceFrame";
 import PriceTag from "../../components/PriceTag";
 import FeatureMatrix from "../../components/FeatureMatrix";
 import { TILE } from "../../lib/tiles";
 
-export default function VerticalPage({ params }: { params: Promise<{ vertical: string }> }) {
+export default function VerticalPage({
+  params,
+}: {
+  params: Promise<{ locale: string; vertical: string }>;
+}) {
   const { vertical: slug } = use(params);
   const { t, tr } = useLanguage();
 

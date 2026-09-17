@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { agency } from "../showcase.config";
 import LangSwitcher from "./LangSwitcher";
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "./LanguageProvider";
 
 export default function SiteHeader() {
   const { t } = useLanguage();
@@ -14,7 +13,7 @@ export default function SiteHeader() {
     { href: "/#quy-trinh", label: t("navProcess") },
   ];
 
-  // Séparé de `links` : offre à durée limitée (8 semaines, cf. `apps/site/app/(vitrine)/qua-tang/`),
+  // Séparé de `links` : offre à durée limitée (8 semaines, cf. `qua-tang/`),
   // donc en couleur pour rester visible sans devenir une entrée de nav permanente qu'il
   // faudrait penser à retirer à la fin de l'opération.
   const giftHref = "/qua-tang";

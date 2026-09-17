@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { agency } from "./(vitrine)/showcase.config";
+import { agency } from "./[locale]/(vitrine)/showcase.config";
 
 export default function robots(): MetadataRoute.Robots {
   return {

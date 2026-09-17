@@ -1,10 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import type { Vertical, VerticalId } from "@/lib/registry";
 import { publicDemosFor } from "@/lib/registry";
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "./LanguageProvider";
 import { TILE } from "../lib/tiles";
 
 /**

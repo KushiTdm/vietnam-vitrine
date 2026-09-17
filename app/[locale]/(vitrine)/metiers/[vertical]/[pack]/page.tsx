@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { use } from "react";
 import {
@@ -14,7 +13,7 @@ import {
   VERTICALS,
   type PackId,
 } from "@/lib/registry";
-import { useLanguage } from "../../../components/LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "../../../components/LanguageProvider";
 import DeviceFrame from "../../../components/DeviceFrame";
 import QrPanel from "../../../components/QrPanel";
 import PriceTag from "../../../components/PriceTag";
@@ -26,7 +25,7 @@ import PriceTag from "../../../components/PriceTag";
 export default function DemoPage({
   params,
 }: {
-  params: Promise<{ vertical: string; pack: string }>;
+  params: Promise<{ locale: string; vertical: string; pack: string }>;
 }) {
   const { vertical: slug, pack: packSlug } = use(params);
   const { t, tr } = useLanguage();

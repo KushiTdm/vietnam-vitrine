@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { PROCESS } from "@/lib/registry";
 import { agency } from "../showcase.config";
-import { useLanguage } from "./LanguageProvider";
+import { useLanguage, LocalizedLink as Link } from "./LanguageProvider";
 
 export default function SiteFooter() {
   const { t, tr } = useLanguage();
