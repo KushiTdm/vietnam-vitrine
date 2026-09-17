@@ -20,7 +20,7 @@ import type { VerticalId } from "@/lib/registry";
 export const TILE: Partial<Record<VerticalId, string>> = {
   cafe: "/vitrine/metier-cafe.webp",
   salon: "/vitrine/metier-salon.webp",
-  shop: "/vitrine/metier-shop.webp",
+  shop: "/vitrine/metier-shop2.webp",
   restaurant: "/vitrine/metier-restaurant.webp",
   homestay: "/vitrine/metier-homestay.webp",
   clinique: "/vitrine/metier-clinique.webp",
