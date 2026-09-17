@@ -113,33 +113,28 @@ const CRITERIA: { label: L10n; weight: number }[] = [
   },
 ];
 
-// Lancement décalé au 21/09/2026 — un lundi, pas un mardi comme la précédente grille
-// (15/09). Le rythme hebdomadaire glisse donc lui aussi : post le lundi, annonce le
-// dimanche suivant (6 jours après, cycle de 7 jours lundi à lundi) — l'annonce du
-// dimanche 20h ne change pas, seul le jour du post d'appel bouge.
-// Le 10/10 (samedi) tombe dans le cycle de la semaine 3 et le 20/10 (mardi) dans celui
-// de la semaine 5 : les deux semaines à drapeau ont donc glissé par rapport à l'ancienne
-// grille (elles étaient en semaines 4 et 6), les thèmes non datés se replacent autour.
+// Lancement décalé au 28/09/2026 — un lundi (comme le 21/09 précédent : le rythme
+// hebdomadaire lui-même ne change pas, post le lundi, annonce le dimanche suivant,
+// cycle de 7 jours lundi à lundi).
+// Le 10/10 (samedi) tombe dans le cycle de la semaine 2 et le 20/10 (mardi) dans celui
+// de la semaine 4 : les deux semaines à drapeau ont donc encore glissé d'une semaine par
+// rapport à la grille précédente (elles étaient en semaines 3 et 5), les thèmes non
+// datés se replacent autour — « Trước / Sau đầu tiên » recule d'une semaine à son tour.
 const WEEKS: { n: number; date: string; theme: L10n; flag?: boolean }[] = [
-  { n: 1, date: "21/09", theme: { vi: "Ra mắt", en: "Launch", fr: "Lancement" } },
+  { n: 1, date: "28/09", theme: { vi: "Ra mắt", en: "Launch", fr: "Lancement" } },
   {
     n: 2,
-    date: "28/09",
-    theme: { vi: "Trước / Sau đầu tiên", en: "First before/after", fr: "Premier avant/après" },
-  },
-  {
-    n: 3,
     date: "05/10",
     theme: { vi: "Hà Nội · 10/10", en: "Hà Nội · Oct 10", fr: "Hanoï · 10/10" },
     flag: true,
   },
   {
-    n: 4,
+    n: 3,
     date: "12/10",
-    theme: { vi: "Quán cà phê & quán ăn", en: "Cafés & restaurants", fr: "Cafés et restaurants" },
+    theme: { vi: "Trước / Sau đầu tiên", en: "First before/after", fr: "Premier avant/après" },
   },
   {
-    n: 5,
+    n: 4,
     date: "19/10",
     theme: {
       vi: "Phụ nữ Việt Nam · tiệm tóc, spa",
@@ -148,9 +143,14 @@ const WEEKS: { n: number; date: string; theme: L10n; flag?: boolean }[] = [
     },
     flag: true,
   },
-  { n: 6, date: "26/10", theme: { vi: "Cửa hàng", en: "Shops", fr: "Boutiques" } },
-  { n: 7, date: "02/11", theme: { vi: "Homestay", en: "Homestays", fr: "Homestays" } },
-  { n: 8, date: "09/11", theme: { vi: "Tuần cuối cùng", en: "Final week", fr: "Dernière semaine" } },
+  {
+    n: 5,
+    date: "26/10",
+    theme: { vi: "Quán cà phê & quán ăn", en: "Cafés & restaurants", fr: "Cafés et restaurants" },
+  },
+  { n: 6, date: "02/11", theme: { vi: "Cửa hàng", en: "Shops", fr: "Boutiques" } },
+  { n: 7, date: "09/11", theme: { vi: "Homestay", en: "Homestays", fr: "Homestays" } },
+  { n: 8, date: "16/11", theme: { vi: "Tuần cuối cùng", en: "Final week", fr: "Dernière semaine" } },
 ];
 
 const SERVICE_FEE_ITEMS: L10n[] = [
@@ -224,9 +224,9 @@ const RULES: { title: L10n; body: L10n }[] = [
   {
     title: { vi: "Thời gian", en: "Duration", fr: "Durée" },
     body: {
-      vi: "8 tuần đầu tiên, từ 21/09/2026 đến hết 15/11/2026, mỗi tuần chọn 1 cơ sở. Nếu chương trình vẫn hiệu quả, Neuraweb có thể kéo dài thêm — thông báo trước trên trang.",
-      en: "The first 8 weeks run from 21 Sep 2026 through 15 Nov 2026, one business chosen per week. If it's working, Neuraweb may extend the offer — announced in advance on the page.",
-      fr: "Les 8 premières semaines courent du 21/09/2026 au 15/11/2026 inclus, un établissement choisi par semaine. Si l'opération fonctionne, Neuraweb pourra la prolonger — annoncé à l'avance sur la page.",
+      vi: "8 tuần đầu tiên, từ 28/09/2026 đến hết 22/11/2026, mỗi tuần chọn 1 cơ sở. Nếu chương trình vẫn hiệu quả, Neuraweb có thể kéo dài thêm — thông báo trước trên trang.",
+      en: "The first 8 weeks run from 28 Sep 2026 through 22 Nov 2026, one business chosen per week. If it's working, Neuraweb may extend the offer — announced in advance on the page.",
+      fr: "Les 8 premières semaines courent du 28/09/2026 au 22/11/2026 inclus, un établissement choisi par semaine. Si l'opération fonctionne, Neuraweb pourra la prolonger — annoncé à l'avance sur la page.",
     },
   },
   {
@@ -373,7 +373,7 @@ export default function GiftPage() {
             </div>
 
             <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px] text-[rgba(243,237,227,0.7)]">
-              <span>21/09/2026 → 15/11/2026</span>
+              <span>28/09/2026 → 22/11/2026</span>
               <span aria-hidden>·</span>
               <span>{t("giftRun")}</span>
             </div>
@@ -446,7 +446,7 @@ export default function GiftPage() {
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 pt-1.5">
                 <p className="text-[16px]">{t("giftStep1")}</p>
                 <a
-                  href={`https://facebook.com/${agency.facebookPage}`}
+                  href={agency.socials.facebook}
                   target="_blank"
                   rel="noreferrer"
                   className="tap text-[14px] font-medium underline underline-offset-4 hover:no-underline"
