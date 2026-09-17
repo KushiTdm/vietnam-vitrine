@@ -12,6 +12,10 @@ export const agency = {
   // TODO: votre page Facebook (pour m.me/)
   facebookPage: "webhanoi.studio",
   email: "xinchao@webhanoi.vn",
+  socials: {
+    facebook: "https://www.facebook.com/people/Neuraweb/61587416320627/",
+    x: "https://x.com/neurawebtech",
+  },
   // Domaine de CE projet (vitrine, déployée sur Vercel) — pas celui des
   // démos (`hanoi-demos-site.san3neb.workers.dev`, resté sur Cloudflare et
   // référencé via NEXT_PUBLIC_DEMOS_BASE_URL, voir packages/registry).
