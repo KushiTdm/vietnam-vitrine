@@ -1,0 +1,12 @@
+{
+  "/(vitrine)/metiers/[vertical]/[pack]/page": "/metiers/[vertical]/[pack]",
+  "/(vitrine)/metiers/[vertical]/page": "/metiers/[vertical]",
+  "/(vitrine)/packs/page": "/packs",
+  "/(vitrine)/page": "/",
+  "/(vitrine)/qua-tang/page": "/qua-tang",
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/icon.svg/route": "/icon.svg",
+  "/robots.txt/route": "/robots.txt",
+  "/sitemap.xml/route": "/sitemap.xml"
+}

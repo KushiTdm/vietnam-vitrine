@@ -1,0 +1,181 @@
+@import "tailwindcss";
+
+/*
+  La vitrine est le site de l'agence, pas une démo. Elle a donc sa propre identité :
+  fond papier chaud et encre profonde, pour rester lisible sur un téléphone en plein
+  soleil — le cas d'usage réel, en terrasse. Les couleurs vives viennent des packs
+  eux-mêmes (`Pack.accent`), pas du fond.
+*/
+:root {
+  --ground: #faf7f2;
+  --ink: #16140f;
+  --muted: #6f6656;
+  --line: rgba(22, 20, 15, 0.12);
+  --deep: #14120e;
+  --on-deep: #f3ede3;
+  --gold: #b8892b;
+}
+
+@theme inline {
+  --color-ground: var(--ground);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-deep: var(--deep);
+  --color-on-deep: var(--on-deep);
+  --color-gold: var(--gold);
+  --font-sans: var(--font-body);
+  --font-display: var(--font-display);
+}
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body), system-ui, sans-serif;
+    /* 16 px minimum : en dessous, iOS zoome au focus d'un champ. */
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Toute cible tactile fait au moins 44 px de haut — règle de l'audit responsive. */
+  a,
+  button {
+    touch-action: manipulation;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+}
+
+@layer utilities {
+  /*
+    Hauteur minimale de cible tactile. Attention : cet utilitaire pose un `display`,
+    il ne peut donc pas être combiné avec `hidden` (le display gagnerait et
+    l'élément resterait visible). Pour un élément masqué sous un point de rupture,
+    utiliser `hidden sm:inline-flex min-h-11 items-center` à la place.
+  */
+  .tap {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+}
+
+/* =====================================================================
+   Révélation au scroll — voir components/ScrollFx.tsx
+   L'état par défaut est VISIBLE. Seul `[data-reveal-ready]`, posé par le
+   script d'amorce avant la peinture du corps, arme l'état masqué : sans
+   JavaScript (ou en `prefers-reduced-motion`), rien n'est jamais caché.
+   Aucun conteneur d'iframe ne porte `data-reveal` — voir ScrollFx.
+   ===================================================================== */
+@keyframes reveal-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes reveal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes reveal-scale {
+  from {
+    opacity: 0;
+    transform: scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes reveal-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes reveal-right {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+[data-reveal-ready] [data-reveal] {
+  opacity: 0;
+}
+[data-reveal-ready] [data-reveal].is-in {
+  animation: reveal-up 0.5s cubic-bezier(0.22, 0.7, 0.25, 1) both;
+  animation-delay: var(--d, 0ms);
+}
+[data-reveal-ready] [data-reveal="scale"].is-in {
+  animation-name: reveal-scale;
+}
+[data-reveal-ready] [data-reveal="none"].is-in {
+  animation-name: reveal-fade;
+}
+
+/* Les variantes latérales ne s'arment qu'à partir de la tablette : sous 768 px les
+   colonnes sont empilées pleine largeur et un `translateX` positif ferait déborder
+   la page horizontalement (règle 1 de l'audit responsive). Elles retombent alors
+   sur la montée verticale, qui ne déborde jamais. */
+@media (min-width: 768px) {
+  [data-reveal-ready] [data-reveal="left"].is-in {
+    animation-name: reveal-left;
+  }
+  [data-reveal-ready] [data-reveal="right"].is-in {
+    animation-name: reveal-right;
+  }
+}
+
+/* L'apparition au scroll ne doit jamais empêcher de lire. */
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

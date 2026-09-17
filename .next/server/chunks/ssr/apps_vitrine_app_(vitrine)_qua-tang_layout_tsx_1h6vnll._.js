@@ -1,0 +1,3 @@
+module.exports=[76533,a=>{"use strict";a.s(["default",0,function({children:a}){return a},"metadata",0,{title:"Tặng một trang web, mỗi tuần",description:"8 tuần, mỗi tuần một cơ sở kinh doanh ở Hà Nội được tặng một trang web — xét chọn theo tiêu chí, không bốc thăm may rủi.",openGraph:{title:"Tặng một trang web, mỗi tuần",description:"8 tuần, mỗi tuần một cơ sở kinh doanh ở Hà Nội được tặng một trang web — xét chọn theo tiêu chí, không bốc thăm may rủi.",images:[{url:"/vitrine/og-qua-tang.webp",width:1200,height:630}]},twitter:{card:"summary_large_image",images:["/vitrine/og-qua-tang.webp"]}}])},2524,function(a){a.n(a.i(76533))}];
+
+//# sourceMappingURL=apps_vitrine_app_%28vitrine%29_qua-tang_layout_tsx_1h6vnll._.js.map

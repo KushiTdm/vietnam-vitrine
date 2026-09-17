@@ -1,0 +1,415 @@
+import type { Locale } from "@hanoi/registry";
+
+type Dict = Record<string, string>;
+
+/** Textes d'interface de la vitrine. Le vietnamien fait foi ; EN et FR sont des traductions. */
+export const UI: Record<Locale, Dict> = {
+  vi: {
+    // en-tête
+    navMetiers: "Ngành nghề",
+    navPacks: "Bảng giá",
+    navProcess: "Quy trình",
+    quote: "Nhận báo giá",
+    lang: "Chọn ngôn ngữ",
+
+    // accueil
+    heroKicker: "Thiết kế web · Hà Nội",
+    heroTitle: "Website cho quán, salon và cửa hàng ở Hà Nội",
+    heroLead:
+      "Giao trong 7 ngày. Tiếng Việt trước, thêm tiếng Anh và tiếng Pháp. Khách bấm gọi, nhắn Zalo, xem đường đi — ngay trên điện thoại.",
+    heroCta: "Xem các bản demo thật",
+    heroAlt: "Chủ quán xem điện thoại sau quầy hàng",
+    heroCta2: "Xem bảng giá",
+
+    packsTitle: "Ba gói, ba mức",
+    packsLead: "Cùng một cửa hàng, dựng theo ba mức. Bấm vào một gói để xem bản demo hoạt động thật.",
+    priceAlone: "Trả một lần",
+    priceWith: "Kèm bảo trì 12 tháng",
+    perMonth: "/tháng",
+    from: "Từ",
+    onRequest: "Theo yêu cầu",
+    seePack: "Xem chi tiết",
+
+    metiersTitle: "Chọn ngành nghề của bạn",
+    metiersLead: "Mỗi ngành có một cách bán khác nhau. Bản demo cũng vậy.",
+    soon: "Sắp có",
+    seeDemos: "Xem demo",
+
+    processTitle: "Quy trình",
+    processLead: "Bốn bước. Bảy ngày kể từ khi nhận đủ nội dung.",
+
+    contactTitle: "Nhận báo giá",
+    contactLead: "Nhắn Zalo hoặc gọi trực tiếp — trả lời trong ngày.",
+    call: "Gọi",
+    zalo: "Nhắn Zalo",
+    messenger: "Messenger",
+
+    proofLangs: "Tiếng Việt · Anh · Pháp",
+    proofResponsive: "Chạy tốt trên điện thoại",
+    proofPay: "VietQR · MoMo · COD",
+    proofDelivery: "Giao trong 7 ngày",
+
+    // page métier
+    packsForTrade: "Các gói cho ngành này",
+    whatItDoes: "Website làm gì cho bạn",
+    notSold: "Chưa có bản demo — liên hệ để bàn",
+
+    // page démo
+    demoLive: "Bản demo hoạt động thật",
+    openFull: "Mở toàn màn hình",
+    scanMe: "Quét để mở trên điện thoại của bạn",
+    included: "Có trong gói này",
+    onlyAbove: "Chỉ có ở gói cao hơn",
+    design: "Phong cách thiết kế",
+    samePackOther: "Cùng gói này, ngành khác",
+    sameTradeOther: "Cùng ngành này, gói khác",
+    demoNote: "Số điện thoại và tài khoản ngân hàng trong bản demo là số giả.",
+    notDeployed: "Bản demo chạy tại chỗ — chưa có địa chỉ công khai.",
+
+    // comparaison
+    compareTitle: "So sánh chi tiết",
+    compareLead: "Càng lên gói cao, website càng làm được nhiều việc thay bạn.",
+    optionsTitle: "Tùy chọn thêm",
+    optionByPackNote: "Chỉ chênh 100.000₫, bạn có tất cả phần còn lại.",
+    maintenanceTitle: "Bảo trì hằng năm",
+    maintenanceNote: "Trả 10 tháng, dùng 12 tháng.",
+    contactUs: "Liên hệ",
+    leadTime: "Thời gian giao",
+
+    // modifications après livraison
+    modificationsTitle: "Sửa đổi sau khi bàn giao",
+    modificationsLead:
+      "Đổi giá, sửa lỗi, thay ảnh — chuyện luôn xảy ra sau khi giao web. Đây là cách xử lý, viết rõ từ đầu.",
+    scopeIncludedTitle: "Trong phạm vi",
+    scopeExcludedTitle: "Ngoài phạm vi",
+
+    // offre « Mỗi tuần một trang » — jeu Facebook de lancement, 8 tuần
+    navGift: "Ưu đãi tuần",
+    giftKicker: "Ưu đãi ra mắt · 8 tuần",
+    giftHeroTitle: "Tặng một trang web. Mỗi tuần.",
+    giftHeroLead:
+      "Mỗi tuần, Neuraweb chọn một cơ sở kinh doanh ở Hà Nội và làm tặng trọn bộ một trang web. Xét chọn theo tiêu chí — không bốc thăm may rủi.",
+    giftHeroImageAlt: "Tấm áp phích mã QR cầm trên tay, trước một quầy hàng ở Hà Nội",
+    giftValueCaption: "thiết kế & lập trình · tặng trọn vẹn",
+    giftCtaSteps: "Cách tham gia",
+    giftCtaTerms: "Điều kiện",
+    giftRun: "Công bố tối Chủ Nhật 20h",
+    giftFootnote: "Phí mở dịch vụ 50 USD và tên miền do cơ sở được chọn tự trả.",
+    giftFootnoteLink: "Xem điều kiện đầy đủ",
+    giftReceivesKicker: "Phần được tặng",
+    giftReceivesTitle: "Anh/chị nhận được gì",
+    giftTotalLabel: "Tổng giá trị phần được tặng",
+    giftHowKicker: "2 bước",
+    giftHowTitle: "Cách tham gia",
+    giftStep1: "Theo dõi trang Neuraweb",
+    giftStep2: "Bình luận dưới bài đăng của tuần, đề xuất một quán/tiệm, theo mẫu",
+    giftCommentLabel: "Bình luận của anh/chị",
+    giftCommentExample:
+      "Cà phê Ngõ Nhỏ – 12 Hàng Bún, Ba Đình – Quán em mở 8 tháng rồi mà khách vẫn không tìm được trên Google.",
+    giftNominateNote:
+      "Anh/chị có thể giới thiệu chính quán của mình, hoặc đề xuất một quán/tiệm khác mà anh/chị thấy xứng đáng.",
+    giftNoShare: "Không cần chia sẻ bài viết, không cần tag bạn bè. Hai bước trên là đủ.",
+    giftHowImageAlt: "Máy tính xách tay mở trên quầy, hiển thị trang web vừa bàn giao",
+    giftCriteriaKicker: "Không bốc thăm",
+    giftCriteriaTitle: "Neuraweb chọn thế nào",
+    giftCriteriaLead: "Mỗi Chủ Nhật 20h, công khai trên trang. Tiêu chí cố định suốt 8 tuần.",
+    giftCriteriaGateKicker: "Điều kiện để được xét",
+    giftCriteriaGateNote:
+      "Thiếu điều kiện này, hồ sơ không được xét — không chấm điểm, không xếp hạng.",
+    giftCriteriaThenLabel: "Sau đó, các hồ sơ hợp lệ được xếp hạng theo",
+    giftCalendarKicker: "8 tuần đầu tiên",
+    giftCalendarTitle: "Lịch chương trình",
+    giftCalendarNote: "Nếu vẫn hiệu quả, chương trình có thể kéo dài thêm — sẽ thông báo trước trên trang.",
+    giftWeekLabel: "Tuần",
+    giftBandeauCaption: "Tám tuần, tám cơ sở, ngay tại Hà Nội.",
+    giftTermsKicker: "Điều kiện của chương trình",
+    giftTermsTitle: "Hai khoản cơ sở được chọn tự trả",
+    giftTermsLead:
+      "Phần thiết kế và lập trình (4.900.000₫) được tặng trọn vẹn. Hai khoản dưới đây không nằm trong phần tặng.",
+    giftServiceFeeTitle: "Phí mở dịch vụ",
+    giftServiceFeeAmount: "50 USD · ~1.300.000₫",
+    giftServiceFeeNote:
+      "Trả một lần duy nhất, trước khi trang lên mạng. Sau đó không có phí hằng tháng, không hợp đồng ràng buộc.",
+    giftServiceFeeDetails: "Khoản này gồm những gì",
+    giftDomainTitle: "Tên miền",
+    giftDomainAmount: "~300.000₫/năm",
+    giftDomainNote:
+      "Anh/chị tự mua, đứng tên anh/chị, ở nhà cung cấp anh/chị chọn (.com khoảng 300.000₫/năm, .vn khoảng 750.000₫/năm). Neuraweb không cầm tiền tên miền của anh/chị — và vì tên miền đứng tên anh/chị, nó là của anh/chị mãi mãi.",
+    giftExclusionsTitle: "Trang tặng này chưa có gì",
+    giftExclusionsLead:
+      "Một trang duy nhất, tiếng Việt. Những mục dưới đây thuộc các gói trả phí — nói trước để anh/chị không bất ngờ lúc bàn giao.",
+    giftFixNote:
+      "Sửa lỗi chính tả hoặc sai thông tin trong 7 ngày đầu vẫn miễn phí — đó là hoàn thiện, không phải sửa đổi.",
+    giftRulesKicker: "Đầy đủ, không giấu",
+    giftRulesTitle: "Thể lệ chương trình",
+    giftMetaDisclaimer:
+      "Chương trình «Mỗi tuần một trang» do Neuraweb tổ chức tại Hà Nội. Chương trình này không được Facebook/Meta tài trợ, quản lý hay bảo trợ, và không liên kết với Facebook/Meta.",
+  },
+  en: {
+    navMetiers: "Trades",
+    navPacks: "Pricing",
+    navProcess: "How it works",
+    quote: "Get a quote",
+    lang: "Choose language",
+
+    heroKicker: "Web design · Hà Nội",
+    heroTitle: "Websites for cafés, salons and shops in Hà Nội",
+    heroLead:
+      "Delivered in 7 days. Vietnamese first, English and French too. Customers call, message on Zalo and find you — straight from their phone.",
+    heroCta: "See the working demos",
+    heroAlt: "A shopkeeper looking at her phone behind the counter",
+    heroCta2: "See pricing",
+
+    packsTitle: "Three packs, three levels",
+    packsLead: "The same shop, built three ways. Open a pack to browse a real, working demo.",
+    priceAlone: "One-off",
+    priceWith: "With 12-month maintenance",
+    perMonth: "/month",
+    from: "From",
+    onRequest: "On request",
+    seePack: "See details",
+
+    metiersTitle: "Pick your trade",
+    metiersLead: "Every trade sells differently. So does every demo.",
+    soon: "Soon",
+    seeDemos: "See demos",
+
+    processTitle: "How it works",
+    processLead: "Four steps. Seven days from the moment your content is in.",
+
+    contactTitle: "Get a quote",
+    contactLead: "Message on Zalo or call — we answer the same day.",
+    call: "Call",
+    zalo: "Zalo",
+    messenger: "Messenger",
+
+    proofLangs: "Vietnamese · English · French",
+    proofResponsive: "Built for phones",
+    proofPay: "VietQR · MoMo · COD",
+    proofDelivery: "Delivered in 7 days",
+
+    packsForTrade: "Packs for this trade",
+    whatItDoes: "What the site does for you",
+    notSold: "No demo yet — get in touch",
+
+    demoLive: "A real, working demo",
+    openFull: "Open full screen",
+    scanMe: "Scan to open it on your phone",
+    included: "Included in this pack",
+    onlyAbove: "Only in a higher pack",
+    design: "Visual direction",
+    samePackOther: "Same pack, another trade",
+    sameTradeOther: "Same trade, another pack",
+    demoNote: "Phone numbers and bank details in the demos are placeholders.",
+    notDeployed: "This demo runs locally — no public address yet.",
+
+    compareTitle: "Detailed comparison",
+    compareLead: "The higher the pack, the more the site does for you.",
+    optionsTitle: "Add-ons",
+    optionByPackNote: "For just 100,000₫ more, you get everything else.",
+    maintenanceTitle: "Annual maintenance",
+    maintenanceNote: "Pay 10 months, get 12.",
+    contactUs: "Get in touch",
+    leadTime: "Lead time",
+
+    // changes after delivery
+    modificationsTitle: "Changes after delivery",
+    modificationsLead:
+      "A price to change, a typo to fix, a photo to swap — it always happens after launch. Here's exactly how it's handled.",
+    scopeIncludedTitle: "In scope",
+    scopeExcludedTitle: "Out of scope",
+
+    // « Mỗi tuần một trang » offer — 8-week Facebook launch giveaway
+    navGift: "This week's offer",
+    giftKicker: "Launch offer · 8 weeks",
+    giftHeroTitle: "One website. Given away. Every week.",
+    giftHeroLead:
+      "Every week, Neuraweb picks one business in Hà Nội and builds it a website for free. Chosen on merit — never a raffle.",
+    giftHeroImageAlt: "A QR-code poster held up in front of a shop counter in Hà Nội",
+    giftValueCaption: "design & build · fully free",
+    giftCtaSteps: "How to enter",
+    giftCtaTerms: "Terms",
+    giftRun: "Winner announced Sunday at 8pm",
+    giftFootnote: "A one-off setup fee (50 USD) and the domain name stay with the winner.",
+    giftFootnoteLink: "See the full terms",
+    giftReceivesKicker: "What's included",
+    giftReceivesTitle: "What you get",
+    giftTotalLabel: "Total value of what's given",
+    giftHowKicker: "2 steps",
+    giftHowTitle: "How to enter",
+    giftStep1: "Follow the Neuraweb page",
+    giftStep2: "Comment on this week's post, nominating a business, in this format",
+    giftCommentLabel: "Your comment",
+    giftCommentExample: "Business name – Address or Google Maps link – One line: why it deserves a website.",
+    giftNominateNote: "You can enter your own business, or nominate another one you think deserves it.",
+    giftNoShare: "No share needed, no tagging friends. These two steps are enough.",
+    giftHowImageAlt: "A laptop open on the counter, showing the site just delivered",
+    giftCriteriaKicker: "Never a raffle",
+    giftCriteriaTitle: "How Neuraweb picks",
+    giftCriteriaLead: "Announced publicly every Sunday at 8pm. The criteria stay the same all 8 weeks.",
+    giftCriteriaGateKicker: "To be considered at all",
+    giftCriteriaGateNote: "Without it, the entry isn't reviewed — no score, no ranking.",
+    giftCriteriaThenLabel: "Then, valid entries are ranked on",
+    giftCalendarKicker: "The first 8 weeks",
+    giftCalendarTitle: "The schedule",
+    giftCalendarNote: "If it keeps working, the offer may run longer — announced in advance on the page.",
+    giftWeekLabel: "Week",
+    giftBandeauCaption: "Eight weeks, eight businesses, right here in Hà Nội.",
+    giftTermsKicker: "Terms of the offer",
+    giftTermsTitle: "Two costs the winner covers",
+    giftTermsLead:
+      "The design and build (4,900,000₫) are fully free. The two items below are not part of the gift.",
+    giftServiceFeeTitle: "Setup fee",
+    giftServiceFeeAmount: "50 USD · ~1,300,000₫",
+    giftServiceFeeNote: "Paid once, before the site goes live. After that: no monthly fee, no contract.",
+    giftServiceFeeDetails: "What this fee covers",
+    giftDomainTitle: "Domain name",
+    giftDomainAmount: "~300,000₫/year",
+    giftDomainNote:
+      "Bought by the winner, in the winner's own name, from any registrar (.com from ~300,000₫/year, .vn from ~750,000₫/year). Neuraweb never handles the domain payment — and because it's in your name, it's yours for good.",
+    giftExclusionsTitle: "What the free page doesn't include",
+    giftExclusionsLead:
+      "A single Vietnamese page. The items below belong to the paid packs — said upfront so there's no surprise at delivery.",
+    giftFixNote:
+      "A typo or a factual error fixed within the first 7 days stays free — that's a finishing touch, not a change.",
+    giftRulesKicker: "Complete, nothing hidden",
+    giftRulesTitle: "Full terms",
+    giftMetaDisclaimer:
+      "The «Mỗi tuần một trang» offer is run by Neuraweb in Hà Nội. It is not sponsored, endorsed or administered by Facebook/Meta, and is not associated with them.",
+  },
+  fr: {
+    navMetiers: "Métiers",
+    navPacks: "Tarifs",
+    navProcess: "Déroulé",
+    quote: "Demander un devis",
+    lang: "Choisir la langue",
+
+    heroKicker: "Création de sites · Hà Nội",
+    heroTitle: "Des sites pour les cafés, salons et boutiques de Hanoi",
+    heroLead:
+      "Livré en 7 jours. Vietnamien d'abord, anglais et français ensuite. Le client appelle, écrit sur Zalo, trouve la boutique — depuis son téléphone.",
+    heroCta: "Voir les démos réelles",
+    heroAlt: "Une commerçante regarde son téléphone derrière son comptoir",
+    heroCta2: "Voir les tarifs",
+
+    packsTitle: "Trois packs, trois niveaux",
+    packsLead: "La même boutique, construite de trois façons. Ouvrez un pack pour parcourir une démo qui fonctionne.",
+    priceAlone: "Sans entretien",
+    priceWith: "Avec entretien 12 mois",
+    perMonth: "/mois",
+    from: "Dès",
+    onRequest: "Sur devis",
+    seePack: "Voir le détail",
+
+    metiersTitle: "Choisissez votre métier",
+    metiersLead: "Chaque métier vend autrement. Chaque démo aussi.",
+    soon: "Bientôt",
+    seeDemos: "Voir les démos",
+
+    processTitle: "Déroulé",
+    processLead: "Quatre étapes. Sept jours à partir de la réception du contenu.",
+
+    contactTitle: "Demander un devis",
+    contactLead: "Écrivez sur Zalo ou appelez — réponse le jour même.",
+    call: "Appeler",
+    zalo: "Zalo",
+    messenger: "Messenger",
+
+    proofLangs: "Vietnamien · anglais · français",
+    proofResponsive: "Pensé pour le téléphone",
+    proofPay: "VietQR · MoMo · paiement à la livraison",
+    proofDelivery: "Livré en 7 jours",
+
+    packsForTrade: "Les packs pour ce métier",
+    whatItDoes: "Ce que le site fait pour vous",
+    notSold: "Pas encore de démo — parlons-en",
+
+    demoLive: "Une démo qui fonctionne vraiment",
+    openFull: "Ouvrir en plein écran",
+    scanMe: "Scannez pour l'ouvrir sur votre téléphone",
+    included: "Inclus dans ce pack",
+    onlyAbove: "Seulement au-dessus",
+    design: "Direction artistique",
+    samePackOther: "Le même pack, un autre métier",
+    sameTradeOther: "Le même métier, un autre pack",
+    demoNote: "Les numéros et coordonnées bancaires des démos sont fictifs.",
+    notDeployed: "Démo en local — pas encore d'adresse publique.",
+
+    compareTitle: "Comparaison détaillée",
+    compareLead: "Plus le pack monte, plus le site travaille à votre place.",
+    optionsTitle: "Options",
+    optionByPackNote: "Pour 100.000₫ de plus, vous avez tout le reste.",
+    maintenanceTitle: "Entretien annuel",
+    maintenanceNote: "10 mois payés, 12 mois servis.",
+    contactUs: "Nous écrire",
+    leadTime: "Délai",
+
+    // modifications après livraison
+    modificationsTitle: "Modifications après livraison",
+    modificationsLead:
+      "Changer un prix, corriger une faute, remplacer une photo — ça arrive toujours après la livraison. Voici comment c'est traité, écrit d'avance.",
+    scopeIncludedTitle: "Dans le périmètre",
+    scopeExcludedTitle: "Hors périmètre",
+
+    // offre « Mỗi tuần một trang » — jeu Facebook de lancement, 8 semaines
+    navGift: "L'offre de la semaine",
+    giftKicker: "Offre de lancement · 8 semaines",
+    giftHeroTitle: "Une page offerte. Chaque semaine.",
+    giftHeroLead:
+      "Chaque semaine, Neuraweb choisit un établissement de Hanoï et lui offre une page web complète. Une sélection sur critères — jamais un tirage au sort.",
+    giftHeroImageAlt: "Une affiche QR tenue devant le comptoir d'un commerce à Hanoï",
+    giftValueCaption: "conception & développement · offerts",
+    giftCtaSteps: "Comment participer",
+    giftCtaTerms: "Les conditions",
+    giftRun: "Annonce le dimanche à 20h",
+    giftFootnote:
+      "Les frais de mise en service (50 USD) et le nom de domaine restent à la charge du gagnant.",
+    giftFootnoteLink: "Voir les conditions complètes",
+    giftReceivesKicker: "Ce qui est offert",
+    giftReceivesTitle: "Ce que vous recevez",
+    giftTotalLabel: "Valeur totale de ce qui est offert",
+    giftHowKicker: "2 gestes",
+    giftHowTitle: "Comment participer",
+    giftStep1: "Suivre la page Neuraweb",
+    giftStep2: "Commenter le post de la semaine en proposant un établissement, à ce format",
+    giftCommentLabel: "Votre commentaire",
+    giftCommentExample:
+      "Nom de l'établissement – Adresse ou lien Google Maps – Une phrase : pourquoi il mérite une page.",
+    giftNominateNote:
+      "Vous pouvez présenter votre propre établissement, ou en proposer un autre que vous jugez méritant.",
+    giftNoShare: "Aucun partage, aucun tag d'ami. Ces deux gestes suffisent.",
+    giftHowImageAlt: "Un ordinateur portable ouvert sur le comptoir, montrant le site tout juste livré",
+    giftCriteriaKicker: "Pas de tirage au sort",
+    giftCriteriaTitle: "Comment le choix est fait",
+    giftCriteriaLead: "Chaque dimanche à 20h, publiquement sur la page. Les critères ne bougent pas des 8 semaines.",
+    giftCriteriaGateKicker: "Condition pour être étudié",
+    giftCriteriaGateNote: "Sans elle, la candidature n'est pas examinée : pas de note, pas de classement.",
+    giftCriteriaThenLabel: "Ensuite, les candidatures valides sont classées sur",
+    giftCalendarKicker: "Les 8 premières semaines",
+    giftCalendarTitle: "Le calendrier",
+    giftCalendarNote: "Si l'opération fonctionne, elle pourra continuer au-delà — annoncé à l'avance sur la page.",
+    giftWeekLabel: "Semaine",
+    giftBandeauCaption: "Huit semaines, huit commerces, ici même à Hanoï.",
+    giftTermsKicker: "Conditions de l'offre",
+    giftTermsTitle: "Les deux postes à la charge du gagnant",
+    giftTermsLead:
+      "La conception et le développement (4.900.000₫) sont intégralement offerts. Les deux postes ci-dessous n'en font pas partie.",
+    giftServiceFeeTitle: "Frais de mise en service",
+    giftServiceFeeAmount: "50 USD · ~1.300.000₫",
+    giftServiceFeeNote: "Payés une seule fois, avant la mise en ligne. Ensuite : aucun abonnement, aucun engagement.",
+    giftServiceFeeDetails: "Ce que ces frais couvrent",
+    giftDomainTitle: "Nom de domaine",
+    giftDomainAmount: "~300.000₫/an",
+    giftDomainNote:
+      "Acheté par le gagnant, à son nom, chez le registrar de son choix (.com ~300.000₫/an, .vn ~750.000₫/an). Neuraweb n'encaisse jamais le prix du domaine — et comme il est à votre nom, il vous appartient définitivement.",
+    giftExclusionsTitle: "Ce que la page offerte ne contient pas",
+    giftExclusionsLead:
+      "Une page unique, en vietnamien. Ce qui suit appartient aux packs payants — dit maintenant pour qu'il n'y ait aucune surprise à la livraison.",
+    giftFixNote:
+      "Une coquille ou une erreur factuelle corrigée dans les 7 premiers jours reste gratuite — c'est de la finition, pas une modification.",
+    giftRulesKicker: "Complet, rien de caché",
+    giftRulesTitle: "Règlement complet",
+    giftMetaDisclaimer:
+      "L'opération «Mỗi tuần một trang» est organisée par Neuraweb à Hanoï. Elle n'est ni parrainée, ni administrée par Meta/Facebook, ni associée à eux.",
+  },
+};
