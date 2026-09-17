@@ -5,7 +5,6 @@ import LanguageProvider from "./components/LanguageProvider";
 import ScrollFx from "./components/ScrollFx";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
-import ContactBar from "./components/ContactBar";
 import { agency } from "./showcase.config";
 import "./vitrine.css";
 
@@ -98,7 +97,6 @@ export default async function VitrineLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
-        <ContactBar />
       </LanguageProvider>
     </div>
   );
