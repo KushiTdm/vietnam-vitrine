@@ -13,7 +13,7 @@ import {
   splitFeatures,
   VERTICALS,
   type PackId,
-} from "@hanoi/registry";
+} from "@/lib/registry";
 import { useLanguage } from "../../../components/LanguageProvider";
 import DeviceFrame from "../../../components/DeviceFrame";
 import QrPanel from "../../../components/QrPanel";

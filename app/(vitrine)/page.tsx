@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PACKS, PLANNED_VERTICALS, VERTICALS } from "@hanoi/registry";
+import { PACKS, PLANNED_VERTICALS, VERTICALS } from "@/lib/registry";
 import { useLanguage } from "./components/LanguageProvider";
 import PackCard from "./components/PackCard";
 import VerticalTile, { PlannedTile } from "./components/VerticalTile";

@@ -1,4 +1,4 @@
-import type { VerticalId } from "@hanoi/registry";
+import type { VerticalId } from "@/lib/registry";
 
 /**
  * Vignette photo par métier, en remplacement des emoji du registre (☕ ✂️ 🏮 🍜

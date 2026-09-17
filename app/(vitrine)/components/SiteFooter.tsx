@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PROCESS } from "@hanoi/registry";
+import { PROCESS } from "@/lib/registry";
 import { agency } from "../showcase.config";
 import { useLanguage } from "./LanguageProvider";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { OPTIONS, formatVnd, getPack, type L10n, type Pack } from "@hanoi/registry";
+import { OPTIONS, formatVnd, getPack, type L10n, type Pack } from "@/lib/registry";
 import { agency } from "../showcase.config";
 import { useLanguage } from "../components/LanguageProvider";
 

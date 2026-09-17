@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getVertical } from "@hanoi/registry";
+import { getVertical } from "@/lib/registry";
 
 /**
  * Ce layout n'existe que pour porter les métadonnées de la page métier :

@@ -1,4 +1,4 @@
-import type { Locale } from "@hanoi/registry";
+import type { Locale } from "@/lib/registry";
 
 type Dict = Record<string, string>;
 

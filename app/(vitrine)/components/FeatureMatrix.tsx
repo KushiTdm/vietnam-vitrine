@@ -8,7 +8,7 @@ import {
   type Feature,
   type PackId,
   type VerticalId,
-} from "@hanoi/registry";
+} from "@/lib/registry";
 import { useLanguage } from "./LanguageProvider";
 
 /**

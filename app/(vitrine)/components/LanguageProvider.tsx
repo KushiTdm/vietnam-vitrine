@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import type { L10n, Locale } from "@hanoi/registry";
+import type { L10n, Locale } from "@/lib/registry";
 import { UI } from "../lib/ui";
 
 export const LOCALES: Locale[] = ["vi", "en", "fr"];

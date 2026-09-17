@@ -1,6 +1,6 @@
 "use client";
 
-import { approxUsd, formatVnd, type Pack } from "@hanoi/registry";
+import { approxUsd, formatVnd, type Pack } from "@/lib/registry";
 import { useLanguage } from "./LanguageProvider";
 
 /**

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { publicDemosOf, type Pack } from "@hanoi/registry";
+import { publicDemosOf, type Pack } from "@/lib/registry";
 import { useLanguage } from "./LanguageProvider";
 import PriceTag from "./PriceTag";
 import { PACK_VISUAL } from "../lib/pack-visuals";

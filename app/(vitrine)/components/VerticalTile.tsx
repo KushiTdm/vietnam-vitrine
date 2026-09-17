@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import type { Vertical, VerticalId } from "@hanoi/registry";
-import { publicDemosFor } from "@hanoi/registry";
+import type { Vertical, VerticalId } from "@/lib/registry";
+import { publicDemosFor } from "@/lib/registry";
 import { useLanguage } from "./LanguageProvider";
 import { TILE } from "../lib/tiles";
 

@@ -1,4 +1,4 @@
-import type { PackId } from "@hanoi/registry";
+import type { PackId } from "@/lib/registry";
 
 /**
  * Visuel par palier — mockup d'appareil composé à partir d'une vraie capture de démo

@@ -11,7 +11,7 @@ import {
   getPack,
   publicDemosOf,
   formatVnd,
-} from "@hanoi/registry";
+} from "@/lib/registry";
 import { useLanguage } from "../components/LanguageProvider";
 import FeatureMatrix from "../components/FeatureMatrix";
 import PriceTag from "../components/PriceTag";
