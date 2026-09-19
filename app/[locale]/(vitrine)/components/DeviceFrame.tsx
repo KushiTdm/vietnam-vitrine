@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLanguage } from "./LanguageProvider";
+
+// Largeur de référence : les démos sont conçues pour un viewport mobile
+// normal (~390px). Le cadre visuel, lui, est volontairement plus petit
+// (240px sur mobile, 360px dès sm) pour tenir à l'écran. Sans ce recalage,
+// l'iframe rendait son contenu à la largeur réduite du cadre — le texte ne
+// rétrécit pas plus qu'un mobile normal, donc il paraissait disproportionné.
+// On fait donc tourner l'iframe à sa largeur de référence puis on la
+// rapetisse visuellement avec un `transform: scale()` pour qu'elle tienne
+// dans le cadre, proportions intactes.
+const REFERENCE_WIDTH = 390;
 
 /**
  * La démo tourne pour de vrai dans le cadre — jamais une capture d'écran. C'est ce que
@@ -21,6 +31,19 @@ export default function DeviceFrame({
 }) {
   const { t, locale } = useLanguage();
   const [loaded, setLoaded] = useState(false);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(240 / REFERENCE_WIDTH);
+
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el) return;
+    const update = () => setScale(el.clientWidth / REFERENCE_WIDTH);
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   const sep = url.includes("?") ? "&" : "?";
   const embedUrl = `${url}${sep}embed=1&lang=${locale}`;
   // Le plein écran garde volontairement `embed` absent (barre de comparaison visible),
@@ -30,6 +53,7 @@ export default function DeviceFrame({
   return (
     <div className="flex w-full min-w-0 flex-col items-center gap-4">
       <div
+        ref={frameRef}
         className="relative w-full max-w-[240px] rounded-[1.4rem] border-[4px] border-deep bg-deep shadow-[0_20px_60px_-20px_rgba(22,20,15,0.5)] sm:max-w-[360px] sm:rounded-[2.2rem] sm:border-[10px]"
         style={{ boxShadow: `0 0 0 1px ${accent}33, 0 20px 60px -20px rgba(22,20,15,0.5)` }}
       >
@@ -41,10 +65,11 @@ export default function DeviceFrame({
             parent `bg-white` : l'encoche garde son emplacement visuel, mais dans
             une bande réservée, jamais par-dessus une page réelle.
 
-            `height` explicite obligatoire : un <iframe> est un "replaced
-            element" — en position absolute, `top`+`bottom` seuls (sans
-            `height`) ne l'étirent PAS comme un élément normal, il retombe
-            sur sa taille par défaut du navigateur (300×150px). Sans le
+            `height` explicite obligatoire sur le wrapper ci-dessous : en
+            position absolute, sans `bottom-0`, un bloc n'a pas de hauteur
+            propre — et un <iframe> (à l'intérieur) est en plus un "replaced
+            element" qui retombe sur sa taille par défaut du navigateur
+            (300×150px) si rien ne le contraint. Sans le
             `h-[calc(100%-20px)]` ci-dessous, tout ce qui dépasse ces 150px
             de haut dans la démo (donc presque tout) restait invisible dans
             le cadre — bug réel introduit par ce correctif lui-même,
@@ -57,15 +82,26 @@ export default function DeviceFrame({
           {!loaded && (
             <div className="absolute inset-0 animate-pulse bg-[rgba(22,20,15,0.06)]" aria-hidden />
           )}
-          <iframe
-            src={embedUrl}
-            title={title}
-            loading="lazy"
-            onLoad={() => setLoaded(true)}
-            className="absolute inset-x-0 top-5 h-[calc(100%-20px)] w-full border-0"
-            // La démo est notre propre code : on l'autorise à occuper le cadre.
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-          />
+          <div className="absolute inset-x-0 top-5 h-[calc(100%-20px)] w-full overflow-hidden">
+            <div
+              style={{
+                width: `${100 / scale}%`,
+                height: `${100 / scale}%`,
+                transform: `scale(${scale})`,
+                transformOrigin: "top left",
+              }}
+            >
+              <iframe
+                src={embedUrl}
+                title={title}
+                loading="lazy"
+                onLoad={() => setLoaded(true)}
+                className="h-full w-full border-0"
+                // La démo est notre propre code : on l'autorise à occuper le cadre.
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              />
+            </div>
+          </div>
         </div>
       </div>
 
