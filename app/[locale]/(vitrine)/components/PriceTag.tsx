@@ -1,6 +1,6 @@
 "use client";
 
-import { approxUsd, formatVnd, type Pack } from "@/lib/registry";
+import { NOT_INCLUDED_NOTE, approxUsd, formatVnd, type Pack } from "@/lib/registry";
 import { useLanguage } from "./LanguageProvider";
 
 /**
@@ -9,7 +9,7 @@ import { useLanguage } from "./LanguageProvider";
  * Le montant en dollars sert aux prospects étrangers ; il reste discret.
  */
 export default function PriceTag({ pack, size = "md" }: { pack: Pack; size?: "md" | "lg" }) {
-  const { t } = useLanguage();
+  const { t, tr } = useLanguage();
 
   if (pack.price === null) {
     return (
@@ -18,6 +18,7 @@ export default function PriceTag({ pack, size = "md" }: { pack: Pack; size?: "md
           {t("onRequest")}
         </p>
         <p className="mt-1 text-[14px] text-muted">{t("contactUs")}</p>
+        <p className="mt-2 text-[12px] leading-snug text-muted">{tr(NOT_INCLUDED_NOTE)}</p>
       </div>
     );
   }
@@ -43,6 +44,8 @@ export default function PriceTag({ pack, size = "md" }: { pack: Pack; size?: "md
           </span>
         </p>
       )}
+
+      <p className="mt-3 text-[12px] leading-snug text-muted">{tr(NOT_INCLUDED_NOTE)}</p>
     </div>
   );
 }

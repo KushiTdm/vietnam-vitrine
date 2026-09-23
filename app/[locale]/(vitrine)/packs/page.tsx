@@ -4,6 +4,8 @@ import {
   ENTERPRISE_FLOOR,
   MODIFICATIONS_NOTE,
   MODIFICATIONS_SCOPE,
+  NOT_INCLUDED,
+  NOT_INCLUDED_TITLE,
   OPTIONS,
   PACKS,
   VERTICALS,
@@ -155,6 +157,25 @@ export default function PacksPage() {
             ))}
           </ul>
         </div>
+      </section>
+
+      {/* ────────────── Non inclus dans le prix des packs ────────────── */}
+      <section className="mt-14" data-reveal>
+        <h2 className="font-display text-2xl">{tr(NOT_INCLUDED_TITLE)}</h2>
+        <ul className="mt-4 max-w-2xl">
+          {NOT_INCLUDED.map((item) => (
+            <li key={item.id} className="border-b border-line py-3 text-[15px]">
+              <div className="flex items-baseline justify-between gap-4">
+                <span>{tr(item.label)}</span>
+                <span className="whitespace-nowrap font-medium">
+                  {formatVnd(item.amount)}
+                  <span className="text-muted">{tr(item.unit)}</span>
+                </span>
+              </div>
+              <p className="mt-1 text-[13px] leading-snug text-muted">{tr(item.note)}</p>
+            </li>
+          ))}
+        </ul>
       </section>
 
       {/* ────────────── Modifications après livraison (§2.2 du plan CMS) ────────────── */}

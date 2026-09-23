@@ -70,10 +70,31 @@ export const FEATURES: Feature[] = [
     },
   },
   {
+    // Plafond par palier ajouté — avant cette étape, `galerie` était un simple ✅ partout,
+    // sans limite déclarée nulle part dans le registre ni dans `OFFRE-COMMERCIALE.md`.
+    // Chiffres recalés sur des repères externes plutôt que sur un ressenti :
+    // - Starter (6, plafond imposé) : au-delà, un site à une seule page devient une
+    //   liste, pas une vitrine — cohérent avec la "meilleure pratique" généraliste qui
+    //   vise 10-20 photos pour un petit site multi-rubriques, donc bien en dessous ici.
+    // - Business (30, catalogue "par catégorie") : la pratique généraliste vise 20-30
+    //   photos au lancement, 3-5 par famille — Sahiba (3-4 catégories × ~7-8 photos)
+    //   tombe pile dans cette fourchette.
+    // - Premium (60, catalogue "complet + fiches détaillées" = vraies fiches produit) :
+    //   la pratique e-commerce vise 5-8 photos par produit ; ~10 produits vedettes avec
+    //   fiche détaillée × 6 photos (milieu de fourchette) = 60. Le reste du catalogue
+    //   garde une photo par fiche, financée par l'option `photos-supp` ci-dessous.
+    // - Enterprise (illimité) : cohérent avec "administration propre" / export déjà
+    //   illimités sur les autres lignes de ce palier.
+    // Au-delà du plafond, l'option `photos-supp` de `packs.ts` vend des lots de 10.
     id: "galerie",
     group: "contenu",
     label: { vi: "Thư viện ảnh", en: "Photo gallery", fr: "Galerie photos" },
-    values: { "khoi-dau": yes, "phat-trien": yes, "cao-cap": yes, "doanh-nghiep": yes },
+    values: {
+      "khoi-dau": { vi: "Tối đa 6 ảnh, tối ưu dung lượng", en: "Up to 6 photos, optimized weight", fr: "Jusqu'à 6 photos, poids optimisé" },
+      "phat-trien": { vi: "Tối đa 30 ảnh, theo danh mục, tối ưu dung lượng", en: "Up to 30 photos, by category, optimized weight", fr: "Jusqu'à 30 photos, classées par catégorie, poids optimisé" },
+      "cao-cap": { vi: "Tối đa 60 ảnh, theo từng sản phẩm, tối ưu dung lượng", en: "Up to 60 photos, per product, optimized weight", fr: "Jusqu'à 60 photos, fiches produit, poids optimisé" },
+      "doanh-nghiep": { vi: "Không giới hạn, tối ưu dung lượng", en: "Unlimited, optimized weight", fr: "Illimité, poids optimisé" },
+    },
   },
   {
     id: "actus",

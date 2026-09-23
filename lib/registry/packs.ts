@@ -129,6 +129,17 @@ export const OPTIONS: Option[] = [
   { id: "logo", label: { vi: "Thiết kế logo", en: "Logo design", fr: "Création de logo" }, price: 2_500_000 },
   { id: "zalo-oa", label: { vi: "Zalo OA", en: "Zalo OA", fr: "Zalo OA" }, price: 1_500_000 },
   { id: "photo", label: { vi: "Chụp ảnh sản phẩm", en: "Product photo shoot", fr: "Shooting photo produits" }, price: 2_000_000 },
+  // Distinct de `photo` ci-dessus : ici le client fournit déjà ses photos, il ne s'agit
+  // que de les intégrer au-delà du plafond de `galerie` (features.ts) — retouche légère,
+  // conversion au format adapté (poids optimisé pour le chargement) et mise en page dans
+  // la galerie. Prix calé sur le repère « 500.000₫/heure entamée » déjà utilisé pour les
+  // modifications hors forfait (voir `MODIFICATIONS_NOTE` plus bas) : un lot de 10 photos
+  // correspond à peu près à une heure de travail.
+  {
+    id: "photos-supp",
+    label: { vi: "Ảnh bổ sung (mỗi 10 ảnh)", en: "Extra photos (per 10)", fr: "Photos supplémentaires (par lot de 10)" },
+    price: 500_000,
+  },
   // Remplace les trois anciennes options `espace-contenus` / `espace-catalogue` /
   // `espace-boutique` (4,9 / 6,9 / 9,9 M₫, jamais vendues : aucune démo ne les montrait).
   // Une seule option désormais, à prix variable selon le palier où elle s'achète — elle
@@ -186,6 +197,80 @@ export const MODIFICATIONS_NOTE: L10n = {
   en: "Doesn't roll over to next month. Send requests in one batch — handled within 48 business hours.",
   fr: "Non cumulable d'un mois sur l'autre. Un envoi groupé, traité sous 48 h ouvrées.",
 };
+
+/**
+ * Ce que le prix d'un pack ne couvre PAS. À rappeler à côté de CHAQUE prix affiché
+ * (vitrine, hubs de démos, `OFFRE-COMMERCIALE.md`, prospection).
+ *
+ * Règle commerciale : le déploiement peut être offert, mais uniquement de vive voix, en
+ * face à face — jamais dans un texte, un devis, un message ou une page. L'écrit dit
+ * toujours « non inclus ». Ne pas ajouter ici de formulation du type « offert » ou
+ * « sur demande sans frais » : elle deviendrait un engagement écrit.
+ *
+ * - Déploiement : montant repris de « Frais de mise en service » (`OFFRE-JEU-FACEBOOK.md`
+ *   §4, 50 USD), le même pour tous les paliers.
+ * - Domaine : indicatif, acheté par le client à son nom (jamais via l'agence).
+ * - Base de données : Premium, Enterprise et l'option `espace-gestion` reposent sur
+ *   Cloudflare Worker + D1 + R2 (`apps/site/lib/cms`, démos `cao-cap`), pas sur un export
+ *   statique. L'infra est sur le compte Cloudflare du CLIENT, payée par lui directement.
+ *   5 USD/mois = plan Workers Paid : le palier gratuit existe mais, depuis le
+ *   1er septembre 2026, D1 y refuse les requêtes au-delà de 5 M lectures / 100 k écritures
+ *   par jour — un site marchand ne doit pas tomber en pleine saison.
+ */
+export const DEPLOY_FEE = 1_300_000;
+export const DOMAIN_PER_YEAR = 300_000;
+export const INFRA_DB_PER_MONTH = 130_000;
+
+/** La ligne courte, à poser sous chaque prix. */
+export const NOT_INCLUDED_NOTE: L10n = {
+  vi: "Chưa gồm phí triển khai và tên miền.",
+  en: "Deployment fee and domain name not included.",
+  fr: "Frais de déploiement et nom de domaine non inclus.",
+};
+
+export const NOT_INCLUDED_TITLE: L10n = {
+  vi: "Không nằm trong giá gói",
+  en: "Not included in the pack price",
+  fr: "Non inclus dans le prix du pack",
+};
+
+export type NotIncludedItem = { id: string; label: L10n; amount: number; unit: L10n; note: L10n };
+
+export const NOT_INCLUDED: NotIncludedItem[] = [
+  {
+    id: "deploiement",
+    label: { vi: "Phí triển khai (đưa website lên mạng)", en: "Deployment fee (going live)", fr: "Frais de déploiement (mise en ligne)" },
+    amount: DEPLOY_FEE,
+    unit: { vi: " · một lần", en: " · one-off", fr: " · une fois" },
+    note: {
+      vi: "Cấu hình tên miền, HTTPS, đưa lên mạng, email theo tên miền, hồ sơ Google Maps, hướng dẫn 15 phút.",
+      en: "Domain setup, HTTPS, going live, domain e-mail, Google Maps profile, 15-minute handover.",
+      fr: "Configuration du domaine, HTTPS, mise en ligne, e-mail au nom du domaine, fiche Google Maps, prise en main de 15 minutes.",
+    },
+  },
+  {
+    id: "domaine",
+    label: { vi: "Tên miền", en: "Domain name", fr: "Nom de domaine" },
+    amount: DOMAIN_PER_YEAR,
+    unit: { vi: "/năm (tham khảo)", en: "/year (indicative)", fr: "/an (indicatif)" },
+    note: {
+      vi: "Mua bằng tên của bạn, tại nhà đăng ký bạn chọn.",
+      en: "Bought in your name, from the registrar of your choice.",
+      fr: "Acheté à votre nom, chez le registrar de votre choix.",
+    },
+  },
+  {
+    id: "infra-db",
+    label: { vi: "Hạ tầng cơ sở dữ liệu", en: "Database infrastructure", fr: "Infrastructure base de données" },
+    amount: INFRA_DB_PER_MONTH,
+    unit: { vi: "/tháng (~5 USD)", en: "/month (~$5)", fr: "/mois (~5 USD)" },
+    note: {
+      vi: "Chỉ khi gói dùng cơ sở dữ liệu: Cao Cấp, Doanh Nghiệp, hoặc tùy chọn Tự sửa nội dung. Trả trực tiếp cho Cloudflare, trên tài khoản của bạn.",
+      en: "Only when the pack uses a database: Premium, Enterprise, or the self-service editing option. Paid directly to Cloudflare, on your own account.",
+      fr: "Uniquement si le pack utilise une base de données : Premium, Enterprise, ou l'option espace de gestion. Payée directement à Cloudflare, sur votre propre compte.",
+    },
+  },
+];
 
 /** Les quatre étapes affichées sur l'accueil et la page process. */
 export const PROCESS: { step: number; label: L10n }[] = [
