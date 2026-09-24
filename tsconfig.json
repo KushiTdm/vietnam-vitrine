@@ -11,6 +11,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    // Les tests (`tests/*.test.mts`) tournent sous le lanceur de Node via tsx,
+    // qui exige l'extension dans le chemin d'import. `noEmit` étant déjà à
+    // true, l'option n'a aucun effet sur le build de l'application.
+    "allowImportingTsExtensions": true,
     "jsx": "react-jsx",
     "incremental": true,
     "plugins": [

@@ -5,6 +5,7 @@ import LanguageProvider from "./components/LanguageProvider";
 import ScrollFx from "./components/ScrollFx";
 import SiteHeader from "./components/SiteHeader";
 import SiteFooter from "./components/SiteFooter";
+import Chatbot from "./components/Chatbot";
 import { agency } from "./showcase.config";
 import "./vitrine.css";
 
@@ -97,6 +98,9 @@ export default async function VitrineLayout({
         <SiteHeader />
         <main className="flex-1">{children}</main>
         <SiteFooter />
+        {/* Sous le footer dans l'arbre, flottant à l'écran : il doit rester
+            à l'intérieur de LanguageProvider, sa langue vient de l'URL. */}
+        <Chatbot />
       </LanguageProvider>
     </div>
   );

@@ -38,8 +38,9 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  // Exclut les internes Next et tout chemin avec une extension (icon.svg,
-  // robots.txt, sitemap.xml, assets sous public/) — ils n'ont pas de variante
-  // par langue.
-  matcher: ["/((?!_next|.*\\..*).*)"],
+  // Exclut `/api` (les route handlers ne vivent pas sous [locale] : les
+  // réécrire donnerait /vi/api/... qui n'existe pas), les internes Next, et
+  // tout chemin avec une extension (icon.svg, robots.txt, sitemap.xml, assets
+  // sous public/) — rien de tout cela n'a de variante par langue.
+  matcher: ["/((?!api|_next|.*\\..*).*)"],
 };

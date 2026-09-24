@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "test": "tsx --test tests/*.test.mts",
+    "rag:embeddings": "tsx scripts/build-embeddings.mts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
