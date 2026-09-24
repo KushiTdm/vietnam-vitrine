@@ -212,10 +212,12 @@ export const MODIFICATIONS_NOTE: L10n = {
  * - Domaine : indicatif, acheté par le client à son nom (jamais via l'agence).
  * - Base de données : Premium, Enterprise et l'option `espace-gestion` reposent sur
  *   Cloudflare Worker + D1 + R2 (`apps/site/lib/cms`, démos `cao-cap`), pas sur un export
- *   statique. L'infra est sur le compte Cloudflare du CLIENT, payée par lui directement.
- *   5 USD/mois = plan Workers Paid : le palier gratuit existe mais, depuis le
- *   1er septembre 2026, D1 y refuse les requêtes au-delà de 5 M lectures / 100 k écritures
- *   par jour — un site marchand ne doit pas tomber en pleine saison.
+ *   statique. L'infra est à la charge du client, « à partir de 5 USD/mois » : le montant
+ *   réel dépend de son besoin. 5 USD = plan Workers Paid d'entrée : le palier gratuit
+ *   existe mais, depuis le 1er septembre 2026, D1 y refuse les requêtes au-delà de 5 M
+ *   lectures / 100 k écritures par jour — un site marchand ne doit pas tomber en pleine
+ *   saison. Les textes VISIBLES ne nomment ni le prestataire ni le mode de paiement
+ *   (décision du 24 sept. 2026) : ne pas y réintroduire de précision.
  */
 export const DEPLOY_FEE = 1_300_000;
 export const DOMAIN_PER_YEAR = 300_000;
@@ -234,7 +236,7 @@ export const NOT_INCLUDED_TITLE: L10n = {
   fr: "Non inclus dans le prix du pack",
 };
 
-export type NotIncludedItem = { id: string; label: L10n; amount: number; unit: L10n; note: L10n };
+export type NotIncludedItem = { id: string; label: L10n; amount: number; from?: boolean; unit: L10n; note: L10n };
 
 export const NOT_INCLUDED: NotIncludedItem[] = [
   {
@@ -263,11 +265,12 @@ export const NOT_INCLUDED: NotIncludedItem[] = [
     id: "infra-db",
     label: { vi: "Hạ tầng cơ sở dữ liệu", en: "Database infrastructure", fr: "Infrastructure base de données" },
     amount: INFRA_DB_PER_MONTH,
+    from: true,
     unit: { vi: "/tháng (~5 USD)", en: "/month (~$5)", fr: "/mois (~5 USD)" },
     note: {
-      vi: "Chỉ khi gói dùng cơ sở dữ liệu: Cao Cấp, Doanh Nghiệp, hoặc tùy chọn Tự sửa nội dung. Trả trực tiếp cho Cloudflare, trên tài khoản của bạn.",
-      en: "Only when the pack uses a database: Premium, Enterprise, or the self-service editing option. Paid directly to Cloudflare, on your own account.",
-      fr: "Uniquement si le pack utilise une base de données : Premium, Enterprise, ou l'option espace de gestion. Payée directement à Cloudflare, sur votre propre compte.",
+      vi: "Chỉ khi gói dùng cơ sở dữ liệu: Cao Cấp, Doanh Nghiệp, hoặc tùy chọn Tự sửa nội dung. Số tiền tùy theo nhu cầu của khách hàng.",
+      en: "Only when the pack uses a database: Premium, Enterprise, or the self-service editing option. The amount depends on the client's needs.",
+      fr: "Uniquement si le pack utilise une base de données : Premium, Enterprise, ou l'option espace de gestion. Le montant dépend des besoins du client.",
     },
   },
 ];

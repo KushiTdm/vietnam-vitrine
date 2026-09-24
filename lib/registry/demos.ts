@@ -264,7 +264,6 @@ export const DEMOS: Demo[] = [
       seo: { grep: [{ file: "page.tsx", pattern: "export const metadata" }] },
     },
     knownGaps: [
-      "langues : VI + FR seulement — le palier Khởi Đầu annonce VI + EN (écart E2, chiffré dans reports/CONFORMITE.md)",
       "galerie : aucune galerie photos — la seule image de contenu est le hero. Écart réel, le moins cher à combler du portfolio.",
       "formation : engagement de service (guide PDF), rien à vérifier dans le code",
     ],
@@ -717,7 +716,6 @@ export const DEMOS: Demo[] = [
       responsive: { grep: [{ file: "demo.css", pattern: "@media" }] },
     },
     knownGaps: [
-      "langues : vietnamien seulement — le palier annonce VI + EN",
       "reservation : le formulaire d'accueil n'envoie rien (conforme au palier Khởi Đầu)",
       "gbp, seo : pas de fiche Google Business ni de JSON-LD",
     ],
@@ -1002,7 +1000,7 @@ export const DEMOS: Demo[] = [
       responsive: { grep: [{ file: "layout.tsx", pattern: "device-width" }] },
     },
     knownGaps: [
-      "langues : vietnamien seulement — un homestay vit de la clientèle étrangère, l'anglais est la priorité de cette verticale",
+      "langues : vietnamien seulement, conforme au palier (1 langue) — mais un homestay vit de la clientèle étrangère : l'option langue est LA priorité de cette verticale",
       "calendrier : pas de disponibilité par nuit, la demande part en message",
       "qr, actus, tracking, admin-contenu : absents",
     ],

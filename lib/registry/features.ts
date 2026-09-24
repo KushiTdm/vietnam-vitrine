@@ -28,7 +28,9 @@ export const FEATURES: Feature[] = [
     group: "socle",
     label: { vi: "Ngôn ngữ", en: "Languages", fr: "Langues" },
     values: {
-      "khoi-dau": { vi: "VI + EN", en: "VI + EN", fr: "VI + EN" },
+      // Starter : une seule langue (décision du 24 sept. 2026) — la seconde est l'option
+      // `langue` de `packs.ts`. Avant : « VI + EN ».
+      "khoi-dau": { vi: "1 ngôn ngữ", en: "1 language", fr: "1 langue" },
       "phat-trien": { vi: "VI + EN + FR", en: "VI + EN + FR", fr: "VI + EN + FR" },
       "cao-cap": { vi: "VI + EN + FR", en: "VI + EN + FR", fr: "VI + EN + FR" },
       "doanh-nghiep": { vi: "VI + EN + FR", en: "VI + EN + FR", fr: "VI + EN + FR" },

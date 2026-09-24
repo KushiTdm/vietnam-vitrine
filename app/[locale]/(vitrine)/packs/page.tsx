@@ -168,6 +168,7 @@ export default function PacksPage() {
               <div className="flex items-baseline justify-between gap-4">
                 <span>{tr(item.label)}</span>
                 <span className="whitespace-nowrap font-medium">
+                  {item.from && <span className="font-normal text-muted">{t("from")} </span>}
                   {formatVnd(item.amount)}
                   <span className="text-muted">{tr(item.unit)}</span>
                 </span>

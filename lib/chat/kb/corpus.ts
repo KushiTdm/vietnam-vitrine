@@ -316,8 +316,18 @@ function buildChunks(locale: Locale): Chunk[] {
     locale,
     title: tr(NOT_INCLUDED_TITLE, locale),
     body: NOT_INCLUDED.map((item) => {
-      const from = item.from ? { vi: "từ ", en: "from ", fr: "à partir de " }[locale] : "";
-      return `· ${tr(item.label, locale)} — ${from}${money(item.amount)}${tr(item.unit, locale)} — ${tr(item.note, locale)}`;
+      // `from` (« à partir de ») est un drapeau d'affichage ajouté au registre
+      // après coup. On le lit par `in` plutôt que directement : un déploiement
+      // a échoué le 24 sept. 2026 parce que la version du registre poussée sur
+      // Vercel ne le déclarait pas encore. Un fanion de présentation ne doit
+      // pas pouvoir casser un build.
+      const startsFrom = "from" in item && item.from === true;
+      const from = startsFrom ? { vi: "từ ", en: "from ", fr: "à partir de " }[locale] : "";
+      // L'unité de l'infra porte déjà son équivalent (« /mois (~5 USD) ») :
+      // sans ce test, la ligne sortait « 130.000₫ (~$5)/mois (~5 USD) ».
+      const unit = tr(item.unit, locale);
+      const amount = /USD|\$/i.test(unit) ? formatVnd(item.amount) : money(item.amount);
+      return `· ${tr(item.label, locale)} — ${from}${amount}${unit} — ${tr(item.note, locale)}`;
     }).join("\n"),
     keywords: ["trien khai", "deploiement", "deployment", "ten mien", "domain", "domaine", "hosting", "ha tang"],
     boost: 1.3,
