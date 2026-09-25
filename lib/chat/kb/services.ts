@@ -9,13 +9,34 @@ import type { L10n } from "@/lib/registry";
  * catalogue, ces trois-là se chiffrent après un échange, comme Doanh Nghiệp.
  * D'où un simple `floor` — un plancher annoncé — et pas un prix ferme.
  *
- * ⚠️ PRIX À VALIDER (`confirm: true`). Les planchers sont DÉRIVÉS du rapport
- * observé entre les deux grilles : Starter 1 490 € ↔ 4,9 M₫, Business
- * 3 990 € ↔ 11,9 M₫, Premium 7 990 € ↔ 24,9 M₫, soit un facteur ≈ 8,8. Les
- * montants français correspondants ont été divisés d'autant puis arrondis à
- * la psychologie de la grille locale (x,9 M₫). Personne n'a encore vendu ces
- * trois prestations à Hanoi : ces chiffres sont une proposition, pas une
- * décision commerciale.
+ * ⚠️ PRIX À VALIDER (`confirm: true`), mais ADOSSÉS AU MARCHÉ DE HANOI.
+ *
+ * Une première version divisait les montants français par 8,8 — le rapport
+ * observé entre les deux grilles de sites (Starter 1 490 € ↔ 4,9 M₫). La
+ * méthode était fausse : ce rapport décrit le marché du site vitrine, qui est
+ * commoditisé ici (des sites à 3 M₫ existent). L'app mobile, l'automatisation
+ * et l'IA ne se vendent pas sur ce marché-là, et leurs prix locaux sont
+ * ancrés sur des références d'entreprise, pas sur la concurrence des petits
+ * studios. Le facteur réel est plus proche de 3 que de 9.
+ *
+ * Relevé de marché, septembre 2026 (sources dans le README) :
+ *   - Application mobile : 35–80 M₫ pour une app simple, 60–150 M₫ en
+ *     standard, 150 M₫ et plus quand le code source est remis. Une agence de
+ *     Hanoi affiche « à partir de 60 M₫ » SANS remise du code ni publication
+ *     sur le store.
+ *   - Chatbot IA sur mesure : 125–375 M₫ pour un niveau FAQ mono-canal,
+ *     750 M₫ et plus pour du RAG multilingue. En face, les plateformes SaaS
+ *     génériques (Ahachat, Fchat, Botbanhang) tournent à 150 k₫–2 M₫/mois.
+ *     Entre les deux, rien : c'est exactement le trou que cette offre occupe.
+ *   - Automatisation : aucun marché packagé au Vietnam, surtout de la revente
+ *     de licences. Le repère est donc l'heure de travail — 35 à 55 USD/h pour
+ *     un développeur confirmé à Hanoi, soit 900 k₫ à 1,4 M₫.
+ *
+ * Les planchers ci-dessous se lisent ainsi : sous la référence marché pour
+ * rester vendable à un commerçant, et assez haut pour que la prestation ne
+ * passe pas pour un gadget. Ils s'insèrent dans l'escalier existant :
+ * 4,9 (site) → 9,9 (automatisation) → 11,9 (site) → 19,9 (IA) →
+ * 24,9 (site) → 49,9 (app) → 60 (Doanh Nghiệp).
  *
  * Ce qui change vraiment d'un marché à l'autre n'est pas le prix mais les
  * OUTILS : ici, Zalo, Facebook, KiotViet, VietQR et la facture VAT. Un
@@ -62,7 +83,10 @@ export const SERVICES: Service[] = [
       en: "You have regulars who come back — a neighbourhood café, a gym, a salon with a loyal base. If customers come once, an app is not what you need.",
       fr: "Vous avez des habitués qui reviennent — un café de quartier, une salle de sport, un salon avec sa clientèle. Si vos clients ne viennent qu'une fois, une application n'est pas ce qu'il vous faut.",
     },
-    floor: 29_900_000,
+    // 49,9 M₫ : sous les 60 M₫ affichés par les agences de Hanoi pour une app
+    // simple, ET le code source est remis — ce que les mêmes agences facturent
+    // à partir de 150 M₫. L'argument de vente tient dans cet écart.
+    floor: 49_900_000,
     leadTime: { vi: "4–6 tuần", en: "4–6 weeks", fr: "4 à 6 semaines" },
     confirm: true,
   },
@@ -89,8 +113,11 @@ export const SERVICES: Service[] = [
       en: "You lose an hour a day copying orders by hand, sending reminders, adding up the till. An hour a day is more than thirty hours a month.",
       fr: "Vous perdez une heure par jour à recopier des commandes, envoyer des rappels, faire vos comptes. Une heure par jour, c'est plus de trente heures par mois.",
     },
-    floor: 3_900_000,
-    monthly: 490_000,
+    // 9,9 M₫ ≈ 8 à 10 heures au tarif d'un développeur confirmé de Hanoi.
+    // L'ancienne valeur, 3,9 M₫, revenait à facturer trois heures un chantier
+    // qui en demande deux à cinq jours.
+    floor: 9_900_000,
+    monthly: 990_000,
     leadTime: { vi: "1–3 tuần", en: "1–3 weeks", fr: "1 à 3 semaines" },
     confirm: true,
   },
@@ -117,8 +144,13 @@ export const SERVICES: Service[] = [
       en: "Zalo messages and Facebook comments arrive day and night, and the same ten questions come back every week.",
       fr: "Les messages Zalo et les commentaires Facebook tombent jour et nuit, et les dix mêmes questions reviennent chaque semaine.",
     },
-    floor: 4_900_000,
-    monthly: 490_000,
+    // 19,9 M₫ : six fois moins que le premier prix d'agence pour un chatbot
+    // sur mesure (125 M₫), et très au-dessus d'un abonnement SaaS générique —
+    // ce qui est livré n'est pas un widget de questions-réponses mais un
+    // assistant qui ne parle que de SON commerce, en deux langues.
+    // L'ancienne valeur, 4,9 M₫, ne payait même pas un mois du SaaS d'en face.
+    floor: 19_900_000,
+    monthly: 990_000,
     leadTime: { vi: "2–4 tuần", en: "2–4 weeks", fr: "2 à 4 semaines" },
     confirm: true,
   },

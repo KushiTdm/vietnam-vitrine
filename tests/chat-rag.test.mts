@@ -24,7 +24,8 @@ import { corpus } from "../lib/chat/kb/corpus.ts";
 import { FAQ } from "../lib/chat/kb/faq.ts";
 import { search, withPackCoherence } from "../lib/chat/retrieval.ts";
 import { buildSystemPrompt } from "../lib/chat/context.ts";
-import { PACKS } from "../lib/registry/packs.ts";
+import { SERVICES } from "../lib/chat/kb/services.ts";
+import { ENTERPRISE_FLOOR, PACKS } from "../lib/registry/packs.ts";
 import { formatVnd } from "../lib/registry/format.ts";
 import type { Locale } from "../lib/registry/types.ts";
 
@@ -230,4 +231,37 @@ test("prompt : le RAG divise la taille du prompt par deux au moins", () => {
   const size = buildSystemPrompt("fr", chunks).length;
   assert.ok(size < 18_000, `prompt de ${size} caractères`);
   assert.ok(size < everything / 2, `${size} n'est pas la moitié de ${everything}`);
+});
+
+// ────────────────────────────────────────────────────────────
+// Cohérence de l'escalier : paliers de sites et prestations
+// ────────────────────────────────────────────────────────────
+
+test("prestations : les planchers s'insèrent dans la grille sans la contredire", () => {
+  // L'escalier voulu, relevé sur le marché de Hanoi en septembre 2026 :
+  //   4,9 (site) → 9,9 (automatisation) → 11,9 (site) → 19,9 (IA)
+  //   → 24,9 (site) → 49,9 (app) → 60 (Doanh Nghiệp)
+  // Un prix qui sortirait de cet ordre casserait l'argument de vente : une
+  // automatisation plus chère qu'un site Business, ou une app moins chère
+  // qu'un site Premium, ne se défend pas en rendez-vous.
+  const floor = (id: string) => SERVICES.find((s) => s.id === id)!.floor;
+  const pack = (id: string) => PACKS.find((p) => p.id === id)!.price!;
+
+  assert.ok(floor("automatisation") > pack("khoi-dau"), "automatisation sous le site Starter");
+  assert.ok(floor("automatisation") < pack("phat-trien"), "automatisation au-dessus du site Business");
+  assert.ok(floor("ia") > pack("phat-trien"), "IA sous le site Business");
+  assert.ok(floor("ia") < pack("cao-cap"), "IA au-dessus du site Premium");
+  assert.ok(floor("mobile") > pack("cao-cap"), "app mobile sous le site Premium");
+  assert.ok(floor("mobile") < ENTERPRISE_FLOOR, "app mobile au-dessus du plancher Doanh Nghiệp");
+});
+
+test("prestations : aucun plancher ne descend sous le repère du marché local", () => {
+  // Repères relevés (README) : app simple à partir de 35 M₫ chez les agences,
+  // chatbot sur mesure à partir de 125 M₫, et ~900 k₫ l'heure de développeur
+  // confirmé. On ne s'aligne pas dessus, mais on ne descend pas non plus à un
+  // niveau qui ferait passer la prestation pour un gadget.
+  const floor = (id: string) => SERVICES.find((s) => s.id === id)!.floor;
+  assert.ok(floor("mobile") >= 35_000_000, "app mobile sous le premier prix du marché");
+  assert.ok(floor("ia") >= 15_000_000, "IA au niveau d'un abonnement SaaS générique");
+  assert.ok(floor("automatisation") >= 8 * 900_000, "automatisation sous huit heures de travail");
 });
