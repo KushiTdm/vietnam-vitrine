@@ -48,6 +48,7 @@ import {
 } from "@/lib/chat/guard";
 import { getCached, setCached } from "@/lib/chat/cache";
 import { isBookingRequest, isContactRequest } from "@/lib/chat/intents";
+import { linksFor } from "@/lib/chat/links";
 import { logChat, reportSecurityEvent, type ChatIntent } from "@/lib/chat/telemetry";
 
 // Rendu à la demande : la route lit des en-têtes de requête et un état par IP.
@@ -416,7 +417,12 @@ export async function POST(request: NextRequest) {
     const query = `${previousQuestion} ${message}`.trim();
     const candidates = search(query, locale, RAG_CANDIDATES).filter((h) => h.score >= RAG_MIN_SCORE);
     const ranked = await rerank(query, locale, candidates);
-    const chunks = withPackCoherence(ranked.slice(0, RAG_TOP_K).map((h) => h.chunk), locale, query);
+    // Deux listes, deux usages : `relevant` garde l'ordre de pertinence et
+    // sert à choisir les liens ; `chunks` y ajoute les paliers manquants et
+    // part dans le prompt.
+    const relevant = ranked.slice(0, RAG_TOP_K).map((h) => h.chunk);
+    const chunks = withPackCoherence(relevant, locale, query);
+    const links = linksFor(relevant, locale);
 
     // 💬 La meilleure réponse est parfois déjà écrite. Voir la constante
     // `FAQ_DIRECT_MAX_RUNNER_UP` : question de premier tour, courte, tombant
@@ -435,7 +441,10 @@ export async function POST(request: NextRequest) {
       message.length <= FAQ_DIRECT_MAX_QUESTION_LENGTH &&
       (ranked[1]?.score ?? 0) <= FAQ_DIRECT_MAX_RUNNER_UP
     ) {
-      return reply(best.chunk.body, "faq", { sources: [best.chunk.id] });
+      return reply(best.chunk.body, "faq", {
+        sources: [best.chunk.id],
+        links,
+      });
     }
 
     const messages: { role: "system" | "user" | "assistant"; content: string }[] = [
@@ -509,7 +518,10 @@ export async function POST(request: NextRequest) {
     // de ce qui précède et ne se réutilise pas. Un hors-sujet n'est pas gardé.
     if (firstTurn && !OFF_TOPIC_MARKER.test(raw)) setCached(message, locale, answer, sources);
 
-    return reply(answer, intent, { sources });
+    // Les liens sont construits ici, pas écrits par le modèle : voir
+    // `lib/chat/links.ts`. C'est ce qui rend le comportement identique dans
+    // les trois langues.
+    return reply(answer, intent, { sources, links });
   } catch (error) {
     // `AbortSignal.timeout` remonte ici comme une TimeoutError : même traitement.
     console.error("[chat] erreur:", error);

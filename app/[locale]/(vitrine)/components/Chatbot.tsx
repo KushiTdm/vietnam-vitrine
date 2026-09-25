@@ -12,7 +12,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLanguage } from "./LanguageProvider";
 
-type Message = { role: "user" | "assistant"; content: string };
+/** Un lien proposé sous une réponse — fourni par le serveur, jamais écrit par le modèle. */
+type ChatLink = { label: string; href: string };
+
+type Message = { role: "user" | "assistant"; content: string; links?: ChatLink[] };
 
 type ChatResponse = {
   response?: string;
@@ -23,6 +26,8 @@ type ChatResponse = {
   retryAfter?: number;
   /** Le serveur a reconnu une demande de rendez-vous. */
   showBookingDates?: boolean;
+  /** Pages à proposer sous la réponse : démos du métier, page de prestation. */
+  links?: ChatLink[];
 };
 
 /** Un jour proposé par `GET /api/booking`, avec ses heures encore libres. */
@@ -245,7 +250,10 @@ export default function Chatbot() {
         }
 
         if (data.response) {
-          setMessages((prev) => [...prev, { role: "assistant", content: data.response! }]);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: data.response!, links: data.links },
+          ]);
           if (data.showBookingDates) void loadBookingDays();
         } else {
           setError(data.error ?? t("chatDisclaimer"));
@@ -369,6 +377,23 @@ export default function Chatbot() {
                 }
               >
                 <RichText text={m.content} />
+
+                {/* Les liens viennent du serveur : le modèle n'a pas à les
+                    recopier, ce qu'il ne fait pas de façon fiable en
+                    vietnamien. Même comportement dans les trois langues. */}
+                {m.links?.length ? (
+                  <span className="mt-2.5 flex flex-wrap gap-1.5">
+                    {m.links.map((link) => (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        className="rounded-full border border-line bg-ground px-2.5 py-1 text-[12.5px] font-medium text-ink no-underline transition-colors hover:border-ink"
+                      >
+                        {link.label} →
+                      </a>
+                    ))}
+                  </span>
+                ) : null}
               </div>
             ))}
 

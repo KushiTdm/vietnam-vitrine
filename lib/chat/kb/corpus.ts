@@ -507,8 +507,13 @@ function buildChunks(locale: Locale): Chunk[] {
     const demos = DEMOS.filter((d) => d.vertical === vertical.id && d.status === "live")
       .map((d) => {
         const pack = PACKS.find((p) => p.id === d.pack);
-        const label = `${d.businessName} — ${pack ? tr(pack.gridName, locale) : d.pack}, ${d.district}`;
-        return `${label} → ${path(`/metiers/${vertical.slug}/${d.pack}`, locale)}`;
+        const label = `${d.businessName} (${pack ? tr(pack.gridName, locale) : d.pack}, ${d.district})`;
+        // `Trang : /chemin` plutôt que `→ /chemin`. Mesuré : avec la flèche,
+        // le modèle vietnamien remplaçait le chemin par un mot — « → Đây »,
+        // « → đường dẫn » — ou fabriquait un slug à partir du nom du commerce.
+        // La flèche se lit comme un gabarit à remplir ; une étiquette se lit
+        // comme une valeur à recopier.
+        return `${label} ${l.page} : ${path(`/metiers/${vertical.slug}/${d.pack}`, locale)}`;
       })
       .join("\n    ");
 
