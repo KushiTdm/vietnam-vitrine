@@ -10,7 +10,11 @@ export type ChunkTopic =
   | "process"
   | "jeu"
   | "faq"
-  | "agence";
+  | "agence"
+  /** Ce avec quoi les sites sont construits — voir `tech.ts`. */
+  | "tech"
+  /** Prestations chiffrées après échange : Android, automatisation, IA. */
+  | "service";
 
 /**
  * L'unité de récupération. Un chunk est autonome : le modèle doit pouvoir

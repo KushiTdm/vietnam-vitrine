@@ -53,6 +53,8 @@ import { agency } from "@/app/[locale]/(vitrine)/showcase.config";
 import { UI } from "@/app/[locale]/(vitrine)/lib/ui";
 import { FAQ } from "./faq";
 import { SELLING } from "./selling";
+import { SERVICES } from "./services";
+import { TECH } from "./tech";
 import type { Chunk } from "./types";
 
 /** Préfixe d'URL de la vitrine : VI est servi sans préfixe (voir `proxy.ts`). */
@@ -118,6 +120,12 @@ const L = {
     sellFor: "Hợp với ai",
     sellCeiling: "Gói này KHÔNG làm được",
     ladderTitle: "Vì sao nên lên gói trên — phép tính tự nó nói",
+    serviceTitle: (n: string) => `${n} — tính phí sau khi trao đổi`,
+    serviceFrom: "Từ",
+    serviceMonthly: "phí duy trì hằng tháng",
+    serviceLead: "Thời gian",
+    serviceQuote: "Giá chính xác chốt sau một buổi trao đổi 15 phút — tùy phạm vi công việc.",
+    serviceFor: "Hợp với ai",
     faqTitle: (q: string) => q,
   },
   en: {
@@ -165,6 +173,12 @@ const L = {
     sellFor: "Who it is for",
     sellCeiling: "What this tier does NOT do",
     ladderTitle: "Why the tier above — the arithmetic says it",
+    serviceTitle: (n: string) => `${n} — quoted after a scoping call`,
+    serviceFrom: "From",
+    serviceMonthly: "monthly upkeep",
+    serviceLead: "Lead time",
+    serviceQuote: "The exact figure is set after a 15-minute call — it depends on the scope.",
+    serviceFor: "Who it is for",
     faqTitle: (q: string) => q,
   },
   fr: {
@@ -213,6 +227,12 @@ const L = {
     sellFor: "Pour qui",
     sellCeiling: "Ce que ce palier NE fait PAS",
     ladderTitle: "Pourquoi monter d'un palier — le calcul le dit tout seul",
+    serviceTitle: (n: string) => `${n} — chiffré après un échange`,
+    serviceFrom: "À partir de",
+    serviceMonthly: "entretien mensuel",
+    serviceLead: "Délai",
+    serviceQuote: "Le montant exact se fixe après un échange de 15 minutes — il dépend du périmètre.",
+    serviceFor: "Pour qui",
     faqTitle: (q: string) => q,
   },
 } as const;
@@ -611,6 +631,55 @@ function buildChunks(locale: Locale): Chunk[] {
     body: WEEKS.map((w) => `${l.week} ${w.n} — ${w.date} — ${tr(w.theme, locale)}`).join("\n"),
     keywords: ["lich", "calendrier", "calendar", "tuan", "semaine", "week", "khi nao"],
   });
+
+  // ── Technique ─────────────────────────────────────────────────────────────
+  // Un extrait par fait plutôt qu'un gros bloc : « c'est du WordPress ? » et
+  // « où sont mes données ? » n'appellent pas la même réponse, et un extrait
+  // court se sert tel quel, sans appel au modèle.
+  for (const fact of TECH) {
+    chunks.push({
+      id: `tech:${fact.id}`,
+      topic: "tech",
+      locale,
+      title: tr(fact.label, locale),
+      body: tr(fact.body, locale),
+      keywords: fact.keywords,
+      boost: 1.1,
+    });
+  }
+
+  // ── Prestations chiffrées après échange ───────────────────────────────────
+  for (const service of SERVICES) {
+    const price = [
+      `${l.serviceFrom} ${money(service.floor)}`,
+      service.monthly ? `${money(service.monthly)} ${l.serviceMonthly}` : "",
+    ]
+      .filter(Boolean)
+      .join(" + ");
+
+    chunks.push({
+      id: `service:${service.id}`,
+      topic: "service",
+      locale,
+      title: l.serviceTitle(tr(service.name, locale)),
+      body: [
+        tr(service.promise, locale),
+        tr(service.examples, locale),
+        `${l.serviceFor} : ${tr(service.forWhom, locale)}`,
+        `${price} · ${l.serviceLead} : ${tr(service.leadTime, locale)}`,
+        l.serviceQuote,
+      ].join("\n"),
+      keywords: [
+        service.id,
+        ...(service.id === "mobile"
+          ? ["ung dung", "app", "android", "google play", "dien thoai", "application", "mobile", "apk"]
+          : service.id === "automatisation"
+            ? ["tu dong", "automatisation", "automation", "workflow", "zapier", "n8n", "kiotviet", "sapo", "bang tinh", "spreadsheet", "google sheets", "lap di lap lai"]
+            : ["ai", "tri tue nhan tao", "chatbot", "tro ly", "assistant", "intelligence artificielle", "zalo oa", "tu tra loi", "llm", "gpt"]),
+      ],
+      boost: 1.15,
+    });
+  }
 
   // ── FAQ rédigée ───────────────────────────────────────────────────────────
   for (const entry of FAQ) {

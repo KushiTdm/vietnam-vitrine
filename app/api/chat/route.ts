@@ -40,7 +40,6 @@ import {
   isIpBlocked,
   namesForbiddenProvider,
   noteSaturation,
-  normalize,
   rateLimit,
   registerAbuseSignal,
   registerOffTopicStrike,
@@ -48,6 +47,7 @@ import {
   scrubResponse,
 } from "@/lib/chat/guard";
 import { getCached, setCached } from "@/lib/chat/cache";
+import { isBookingRequest, isContactRequest } from "@/lib/chat/intents";
 import { logChat, reportSecurityEvent, type ChatIntent } from "@/lib/chat/telemetry";
 
 // Rendu à la demande : la route lit des en-têtes de requête et un état par IP.
@@ -219,63 +219,6 @@ const T: Record<Locale, Strings> = {
       "Avec plaisir ! Voici les créneaux libres (heure de Hanoi). Choisissez un jour :",
   },
 };
-
-/**
- * Demandes de coordonnées : réponse statique, zéro appel API — et surtout
- * aucune occasion pour le modèle d'écrire un numéro ou une adresse.
- */
-const CONTACT_TRIGGERS: Record<Locale, string[]> = {
-  vi: [
-    "so dien thoai", "sdt", "goi cho ai", "lien he", "lien lac", "zalo", "messenger",
-    "email", "dia chi", "van phong o dau", "gap truc tiep", "so zalo", "chat voi nguoi that",
-  ],
-  en: [
-    "phone number", "your number", "call you", "contact you", "contact details", "get in touch",
-    "email address", "your email", "your address", "where are you based", "office address",
-    "talk to a human", "speak to someone", "whatsapp", "zalo",
-  ],
-  fr: [
-    "numero de telephone", "votre numero", "vous appeler", "vous contacter", "coordonnees",
-    "adresse mail", "votre email", "votre adresse", "ou etes vous", "vos bureaux",
-    "parler a quelqu un", "un humain", "whatsapp", "zalo",
-  ],
-};
-
-/**
- * Intention de rendez-vous. Comme `CONTACT_TRIGGERS`, c'est une liste fermée
- * évaluée sur le message normalisé (sans accents, `đ` ramené à `d`) : les
- * clients vietnamiens tapent aussi bien « đặt lịch » que « dat lich ».
- *
- * Volontairement plus étroite que la liste du site français : ici, une
- * détection à tort ouvre un calendrier au milieu d'une question de prix.
- */
-const BOOKING_TRIGGERS: Record<Locale, string[]> = {
-  vi: [
-    "dat lich hen", "dat lich tu van", "dat lich gap", "hen gap", "hen lich",
-    "gap truc tiep", "gap mat", "lich trong", "khung gio", "xem lich",
-    "muon gap", "co the gap", "sap xep gap", "hen mot buoi",
-  ],
-  en: [
-    "book a meeting", "book a call", "book an appointment", "make an appointment",
-    "schedule a call", "schedule a meeting", "set up a call", "available slots",
-    "your availability", "meet in person", "meet you", "free slots",
-  ],
-  fr: [
-    "prendre rendez", "prendre un rendez", "rendez-vous", "rendez vous", "un rdv",
-    "prendre rdv", "reserver un creneau", "vos creneaux", "vos disponibilites",
-    "vous rencontrer", "se rencontrer", "convenir d un moment", "fixer un moment",
-  ],
-};
-
-function isBookingRequest(message: string, locale: Locale): boolean {
-  const msg = normalize(message);
-  return BOOKING_TRIGGERS[locale].some((k) => msg.includes(normalize(k)));
-}
-
-function isContactRequest(message: string, locale: Locale): boolean {
-  const msg = normalize(message);
-  return CONTACT_TRIGGERS[locale].some((k) => msg.includes(normalize(k)));
-}
 
 // ────────────────────────────────────────────────────────────
 // Handler

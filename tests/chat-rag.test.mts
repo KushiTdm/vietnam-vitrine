@@ -133,6 +133,19 @@ const CASES: { q: string; locale: Locale; expect: string[] }[] = [
   { q: "how do I get chosen for the free site", locale: "en", expect: ["jeu:participer", "jeu:offert", "jeu:reglement"] },
   // Le visiteur emploie un mot qu'on n'écrit jamais
   { q: "CMS pour éditer le contenu moi-même", locale: "fr", expect: ["faq:modifier-moi-meme", "pack:cao-cap"] },
+  // Technique — la question qui sortait des langages faux
+  { q: "C'est fait avec quel langage ?", locale: "fr", expect: ["tech:socle"] },
+  { q: "what technology do you use?", locale: "en", expect: ["tech:socle"] },
+  { q: "web làm bằng công nghệ gì?", locale: "vi", expect: ["tech:socle"] },
+  { q: "C'est du WordPress ?", locale: "fr", expect: ["tech:pas-wordpress"] },
+  { q: "où sont stockées les données de mes clients ?", locale: "fr", expect: ["tech:donnees", "faq:hebergement"] },
+  // Les trois prestations chiffrées après échange
+  { q: "Vous faites aussi des applications mobiles ?", locale: "fr", expect: ["service:mobile"] },
+  { q: "anh có làm app Android không?", locale: "vi", expect: ["service:mobile"] },
+  { q: "je perds une heure par jour à recopier mes commandes", locale: "fr", expect: ["service:automatisation"] },
+  { q: "can you connect my orders to KiotViet?", locale: "en", expect: ["service:automatisation"] },
+  { q: "je veux un chatbot IA sur mon site", locale: "fr", expect: ["service:ia"] },
+  { q: "tôi muốn trợ lý AI trả lời khách trên Zalo", locale: "vi", expect: ["service:ia"] },
 ];
 
 /**
