@@ -33,4 +33,10 @@ export type Chunk = {
   keywords?: string[];
   /** Multiplicateur de score. > 1 pour ce qui se demande tout le temps. */
   boost?: number;
+  /**
+   * `false` interdit de servir cet extrait tel quel, sans appel au modèle.
+   * Voir `direct` dans `faq.ts` : les questions qui ouvrent une vente méritent
+   * une recommandation, pas un paragraphe figé.
+   */
+  direct?: false;
 };

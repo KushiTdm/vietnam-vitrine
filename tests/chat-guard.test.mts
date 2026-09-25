@@ -14,7 +14,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { detectAbuse, normalize, scrubResponse } from "../lib/chat/guard.ts";
+import { detectAbuse, namesForbiddenProvider, normalize, scrubResponse } from "../lib/chat/guard.ts";
 
 const HINT = "le bouton de contact de la page";
 
@@ -151,5 +151,30 @@ test("scrubResponse : la clé d'API n'est jamais recrachée, même si elle appar
   } finally {
     if (previous === undefined) delete process.env.MISTRAL_API_KEY;
     else process.env.MISTRAL_API_KEY = previous;
+  }
+});
+
+// ────────────────────────────────────────────────────────────
+// Prestataires tiers
+// ────────────────────────────────────────────────────────────
+
+test("prestataires : les marques de domaine et d'hébergement sont repérées", () => {
+  for (const text of [
+    "Vous pouvez acheter chez Namecheap ou GoDaddy.",
+    "Anh/chị mua tên miền ở Mắt Bão nhé.",
+    "We host on Cloudflare.",
+    "Essayez VietDomain pour un .vn",
+  ]) {
+    assert.ok(namesForbiddenProvider(text), `non repéré : ${text}`);
+  }
+});
+
+test("prestataires : une réponse normale n'est pas bloquée", () => {
+  for (const text of [
+    "Le domaine s'achète à votre nom, chez le registrar de votre choix.",
+    "Livraison via GHTK · GHN · Viettel Post, et paiement par VietQR ou MoMo.",
+    "Votre café à Đống Đa mérite une page qui prend les réservations.",
+  ]) {
+    assert.equal(namesForbiddenProvider(text), null, `faux positif : ${text}`);
   }
 });

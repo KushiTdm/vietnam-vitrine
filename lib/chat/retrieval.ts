@@ -21,7 +21,7 @@
 
 import { PACKS, type Locale } from "@/lib/registry";
 import { normalize } from "./guard";
-import { corpus } from "./kb/corpus";
+import { PACK_NAMES, corpus } from "./kb/corpus";
 import type { Chunk } from "./kb/types";
 
 // ────────────────────────────────────────────────────────────
@@ -104,6 +104,9 @@ function expand(tokens: string[]): string[] {
 // ────────────────────────────────────────────────────────────
 // Index BM25
 // ────────────────────────────────────────────────────────────
+
+/** Extraits non-paliers conservés quand les quatre fiches entrent d'un coup. */
+const OTHERS_KEPT = 3;
 
 const K1 = 1.5;
 /**
@@ -207,8 +210,23 @@ export function resetIndexes(): void {
  * de mélanger. Le coût est d'environ 2 500 caractères de prompt, uniquement
  * sur les questions qui parlent de paliers.
  */
-export function withPackCoherence(chunks: Chunk[], locale: Locale): Chunk[] {
-  if (!chunks.some((c) => c.topic === "pack")) return chunks;
+export function withPackCoherence(chunks: Chunk[], locale: Locale, query?: string): Chunk[] {
+  // Trois déclencheurs, et ils disent tous la même chose : « une
+  // recommandation de palier est sur le point d'être faite ».
+  //
+  //  1. un palier est déjà dans les résultats ;
+  //  2. la QUESTION en nomme un — « Khởi Đầu khác Phát Triển ở đâu ? » ne
+  //     ramenait que des pages métier, qui citent les noms des paliers dans un
+  //     texte plus court que les fiches elles-mêmes ;
+  //  3. le visiteur a nommé son MÉTIER. C'est le cas le plus fréquent et le
+  //     plus coûteux : à « tôi có một quán cà phê nhỏ », la recherche rendait
+  //     la page café et rien d'autre. Le modèle recommandait quand même un
+  //     palier — la méthode de vente le lui demande — en le décrivant de
+  //     mémoire, et attribuait à Phát Triển l'espace de gestion, qui est une
+  //     option à 12,9 M₫. Dire son métier, c'est demander une recommandation.
+  const named = query ? PACK_NAMES.some((name) => normalize(query).includes(name)) : false;
+  const tradeKnown = chunks.some((c) => c.topic === "metier");
+  if (!named && !tradeKnown && !chunks.some((c) => c.topic === "pack")) return chunks;
 
   const present = new Set(chunks.map((c) => c.id));
   const missing = corpus(locale).filter(
@@ -217,9 +235,32 @@ export function withPackCoherence(chunks: Chunk[], locale: Locale): Chunk[] {
   if (!missing.length) return chunks;
 
   // Ordre de la grille, pour que le modèle lise l'escalier dans le bon sens.
+  // Un extrait de topic `pack` qui n'est pas une fiche de palier — l'escalier
+  // tarifaire — n'a pas de rang dans la grille : il passe derrière, pas devant.
   const order = PACKS.map((p) => `pack:${p.id}`);
+  const rank = (id: string) => {
+    const index = order.indexOf(id);
+    return index === -1 ? order.length : index;
+  };
   const packs = [...chunks.filter((c) => c.topic === "pack"), ...missing].sort(
-    (a, b) => order.indexOf(a.id) - order.indexOf(b.id),
+    (a, b) => rank(a.id) - rank(b.id),
   );
-  return [...packs, ...chunks.filter((c) => c.topic !== "pack")];
+
+  // Les quatre paliers pèsent déjà ~2 500 caractères : on écourte donc la
+  // queue. Trois extraits et pas deux : à deux, une question précise posée par
+  // quelqu'un qui a aussi nommé son métier — « je veux que les touristes
+  // comprennent mon menu » — perdait sa réponse (la FAQ langues) au profit des
+  // paliers. Le troisième rang la sauve.
+  //
+  // La page MÉTIER passe d'abord, quel que soit
+  // son score : c'est elle qui porte l'argument du commerce du visiteur, et
+  // c'est souvent elle qui a fait entrer les paliers. Plafonner sans la
+  // protéger la faisait éjecter par la présentation du studio — on se
+  // retrouvait à vendre des paliers sans savoir à qui.
+  const nonPacks = chunks.filter((c) => c.topic !== "pack");
+  const others = [
+    ...nonPacks.filter((c) => c.topic === "metier"),
+    ...nonPacks.filter((c) => c.topic !== "metier"),
+  ].slice(0, OTHERS_KEPT);
+  return [...packs, ...others];
 }

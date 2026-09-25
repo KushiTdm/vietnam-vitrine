@@ -318,7 +318,7 @@ export const UI: Record<Locale, Dict> = {
     chatRemaining: "{n} messages left in this session",
     chatDisclaimer: "Automated replies, mistakes possible — the pricing page is what counts.",
     chatSuggest1: "How much do the packs cost?",
-    chatSuggest2: "Khởi Đầu vs Phát Triển?",
+    chatSuggest2: "Starter or Business?",
     chatSuggest3: "How long does a site take?",
     // chatbot — throttling and booking
     chatWait: "Send again in {n}s",
@@ -481,7 +481,7 @@ export const UI: Record<Locale, Dict> = {
     chatRemaining: "{n} messages restants dans cette session",
     chatDisclaimer: "Réponses automatiques, erreurs possibles — la page tarifs fait foi.",
     chatSuggest1: "Combien coûtent les packs ?",
-    chatSuggest2: "Khởi Đầu ou Phát Triển ?",
+    chatSuggest2: "Starter ou Business ?",
     chatSuggest3: "En combien de temps ?",
     // chatbot — blocage et prise de rendez-vous
     chatWait: "Renvoyer dans {n} s",

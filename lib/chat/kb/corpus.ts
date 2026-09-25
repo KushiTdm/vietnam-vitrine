@@ -38,6 +38,7 @@ import {
   type FeatureValue,
   type Locale,
   type Pack,
+  type PackId,
 } from "@/lib/registry";
 import {
   CRITERIA,
@@ -51,6 +52,7 @@ import {
 import { agency } from "@/app/[locale]/(vitrine)/showcase.config";
 import { UI } from "@/app/[locale]/(vitrine)/lib/ui";
 import { FAQ } from "./faq";
+import { SELLING } from "./selling";
 import type { Chunk } from "./types";
 
 /** Préfixe d'URL de la vitrine : VI est servi sans préfixe (voir `proxy.ts`). */
@@ -98,7 +100,7 @@ const L = {
     processTitle: "Quy trình làm việc",
     agencyTitle: "Neuraweb — studio thiết kế web tại Hà Nội",
     agencyBody: (a: string, c: string) =>
-      `${a} là một studio thiết kế web nhỏ tại ${c}, do Nacer sáng lập và trực tiếp làm. Làm website cho quán cà phê, salon, cửa hàng, nhà hàng và homestay ở Hà Nội. Ngôn ngữ làm việc: tiếng Việt, tiếng Anh, tiếng Pháp. Muốn liên hệ, khách bấm nút nhận báo giá hoặc nút Zalo ngay trên trang.`,
+      `${a} là một studio thiết kế web nhỏ tại ${c}, do Nacer sáng lập và điều hành — anh Nacer là giám đốc (CEO), và cũng là người trực tiếp làm. Làm website cho quán cà phê, salon, cửa hàng, nhà hàng và homestay ở Hà Nội. Ngôn ngữ làm việc: tiếng Việt, tiếng Anh, tiếng Pháp. Muốn liên hệ, khách bấm nút nhận báo giá hoặc nút Zalo ngay trên trang.`,
     giftWhat: "Chương trình tặng web — phần được tặng",
     giftHow: "Chương trình tặng web — cách tham gia và cách chọn",
     giftTerms: "Chương trình tặng web — hai khoản tự trả và phần chưa có",
@@ -111,6 +113,11 @@ const L = {
     giftDomain: "Tên miền (~300.000₫/năm) do anh/chị tự mua, đứng tên anh/chị.",
     giftExcl: "Trang tặng CHƯA có (thuộc các gói trả phí)",
     week: "Tuần",
+    sellPromise: "Được gì",
+    sellOver: "Hơn gói dưới ở chỗ",
+    sellFor: "Hợp với ai",
+    sellCeiling: "Gói này KHÔNG làm được",
+    ladderTitle: "Vì sao nên lên gói trên — phép tính tự nó nói",
     faqTitle: (q: string) => q,
   },
   en: {
@@ -140,7 +147,7 @@ const L = {
     processTitle: "How a project runs",
     agencyTitle: "Neuraweb — a web studio in Hà Nội",
     agencyBody: (a: string, c: string) =>
-      `${a} is a small web studio in ${c}, founded and run hands-on by Nacer. It builds websites for cafés, salons, shops, restaurants and homestays in Hanoi. Working languages: Vietnamese, English, French. To get in touch, visitors use the quote button or the Zalo button on the page.`,
+      `${a} is a small web studio in ${c}, founded and run by Nacer, its CEO — who also builds the sites himself. It builds websites for cafés, salons, shops, restaurants and homestays in Hanoi. Working languages: Vietnamese, English, French. To get in touch, visitors use the quote button or the Zalo button on the page.`,
     giftWhat: "Free-website programme — what is given",
     giftHow: "Free-website programme — how to enter and how the pick is made",
     giftTerms: "Free-website programme — the two costs you cover, and what is not included",
@@ -153,6 +160,11 @@ const L = {
     giftDomain: "The domain name (~300,000₫/year) is bought by you, in your name.",
     giftExcl: "The free page does NOT include (these belong to the paid packs)",
     week: "Week",
+    sellPromise: "What it changes",
+    sellOver: "What it adds over the tier below",
+    sellFor: "Who it is for",
+    sellCeiling: "What this tier does NOT do",
+    ladderTitle: "Why the tier above — the arithmetic says it",
     faqTitle: (q: string) => q,
   },
   fr: {
@@ -183,7 +195,7 @@ const L = {
     processTitle: "Déroulé d'un projet",
     agencyTitle: "Neuraweb — studio web à Hanoï",
     agencyBody: (a: string, c: string) =>
-      `${a} est un petit studio web à ${c}, fondé et mené par Nacer lui-même. Il réalise des sites pour les cafés, salons, boutiques, restaurants et homestays de Hanoï. Langues de travail : vietnamien, anglais, français. Pour le contact, les visiteurs utilisent le bouton de devis ou le bouton Zalo de la page.`,
+      `${a} est un petit studio web à ${c}, fondé et dirigé par Nacer, son CEO — qui réalise aussi les sites lui-même. Il réalise des sites pour les cafés, salons, boutiques, restaurants et homestays de Hanoï. Langues de travail : vietnamien, anglais, français. Pour le contact, les visiteurs utilisent le bouton de devis ou le bouton Zalo de la page.`,
     giftWhat: "Opération « un site par semaine » — ce qui est offert",
     giftHow: "Opération « un site par semaine » — participation et sélection",
     giftTerms: "Opération « un site par semaine » — les deux postes à votre charge et ce qui n'y est pas",
@@ -196,6 +208,11 @@ const L = {
     giftDomain: "Le nom de domaine (~300.000₫/an) est acheté par vous, à votre nom.",
     giftExcl: "La page offerte NE comprend PAS (ces éléments relèvent des packs payants)",
     week: "Semaine",
+    sellPromise: "Ce que ça change",
+    sellOver: "Ce que ça ajoute au palier du dessous",
+    sellFor: "Pour qui",
+    sellCeiling: "Ce que ce palier NE fait PAS",
+    ladderTitle: "Pourquoi monter d'un palier — le calcul le dit tout seul",
     faqTitle: (q: string) => q,
   },
 } as const;
@@ -203,6 +220,22 @@ const L = {
 // ────────────────────────────────────────────────────────────
 // Packs
 // ────────────────────────────────────────────────────────────
+
+/**
+ * Les noms par lesquels un visiteur DÉSIGNE un palier, en vietnamien comme en
+ * nom commercial. Volontairement restreint aux noms propres : ni « pro », ni
+ * « gói », ni « moins cher », qui apparaissent dans trop de questions sans
+ * qu'il s'agisse de comparer des paliers.
+ *
+ * Sert à `withPackCoherence` : dès qu'une question nomme un palier, les quatre
+ * entrent dans le prompt, sinon le modèle compare avec ce qu'il a sous la main.
+ */
+export const PACK_NAMES = [
+  "khoi dau", "starter",
+  "phat trien", "business",
+  "cao cap", "premium",
+  "doanh nghiep", "enterprise", "entreprise",
+];
 
 /** Les alias commerciaux d'un palier, toutes langues : « premium » → Cao Cấp. */
 const PACK_ALIASES: Record<string, string[]> = {
@@ -234,12 +267,19 @@ function packChunk(pack: Pack, locale: Locale): Chunk {
   const l = L[locale];
   const name = tr(pack.gridName, locale);
 
+  // « Prise de rendez-vous — Inclus » : le « — Inclus » ne dit rien que la
+  // présence dans la liste ne dise déjà. On ne garde la valeur que lorsqu'elle
+  // précise quelque chose (« 8 pages + espace client », « jusqu'à 60 photos »).
+  // Sur quatre fiches injectées ensemble, ça retire un millier de caractères
+  // de prompt à chaque message sans retirer une seule information.
+  const plainYes = { vi: "Có", en: "Included", fr: "Inclus" }[locale];
   const included: string[] = [];
   for (const [group, label] of Object.entries(FEATURE_GROUP_LABELS)) {
     const rows = FEATURES.filter((f) => f.group === group)
       .map((f) => {
         const value = featureText(f.values[pack.id], locale);
-        return value ? `${tr(f.label, locale)} — ${value}` : null;
+        if (!value) return null;
+        return value === plainYes ? tr(f.label, locale) : `${tr(f.label, locale)} — ${value}`;
       })
       .filter(Boolean);
     if (rows.length) included.push(`${tr(label, locale)} : ${rows.join(" · ")}`);
@@ -249,6 +289,13 @@ function packChunk(pack: Pack, locale: Locale): Chunk {
     .map((f) => tr(f.label, locale))
     .join(" · ");
 
+  // L'argumentaire voyage AVEC les faits du palier, il n'est pas un extrait
+  // séparé : quand `withPackCoherence` fait entrer les quatre paliers, les
+  // quatre arguments entrent avec eux. Un prix sans son bénéfice, c'est une
+  // ligne de catalogue ; le visiteur choisit alors le moins cher par défaut.
+  const sell = SELLING[pack.id];
+  const previous = PACKS[PACKS.findIndex((p) => p.id === pack.id) - 1];
+
   return {
     id: `pack:${pack.id}`,
     topic: "pack",
@@ -256,10 +303,16 @@ function packChunk(pack: Pack, locale: Locale): Chunk {
     title: l.packTitle(name),
     body: [
       tr(pack.pitch, locale),
+      `▶ ${l.sellPromise} : ${tr(sell.promise, locale)}`,
+      sell.over && previous
+        ? `▶ ${l.sellOver} (${tr(previous.gridName, locale)}) : ${tr(sell.over, locale)}`
+        : "",
+      `▶ ${l.sellFor} : ${tr(sell.forWhom, locale)}`,
       ...packPrice(pack, locale),
       `${l.lead} : ${tr(pack.leadTime, locale)}`,
       ...included,
       excluded ? `⛔ ${l.notIn} : ${excluded}` : "",
+      sell.ceiling ? `⛔ ${l.sellCeiling} : ${tr(sell.ceiling, locale)}` : "",
     ]
       .filter(Boolean)
       .join("\n"),
@@ -282,7 +335,11 @@ function buildChunks(locale: Locale): Chunk[] {
     locale,
     title: l.agencyTitle,
     body: l.agencyBody(agency.name, agency.city),
-    keywords: ["neuraweb", "nacer", "hanoi", "ha noi", "studio", "agence", "agency"],
+    keywords: [
+      "neuraweb", "nacer", "hanoi", "ha noi", "studio", "agence", "agency",
+      "ceo", "giam doc", "dieu hanh", "nguoi sang lap", "chu", "dirigeant",
+      "directeur", "patron", "fondateur", "founder", "who runs", "boss",
+    ],
   });
 
   for (const pack of PACKS) chunks.push(packChunk(pack, locale));
@@ -309,6 +366,59 @@ function buildChunks(locale: Locale): Chunk[] {
     keywords: ["option", "tuy chon", "supplement", "logo", "zalo oa", "ads", "photo", "langue", "ngon ngu"],
     boost: 1.2,
   });
+
+  // ── L'escalier tarifaire ─────────────────────────────────────────────────
+  // L'argument de vente le plus fort de la grille, et il était absent du RAG :
+  // il vit dans `OFFRE-COMMERCIALE.md`, que le corpus n'indexe pas. Calculé
+  // ici depuis le registre plutôt que recopié — si un prix bouge, l'argument
+  // reste juste, ou disparaît s'il cesse d'être vrai.
+  const espaceGestion = OPTIONS.find((o) => o.id === "espace-gestion");
+  const rungs: { lower: PackId; upper: PackId }[] = [
+    { lower: "khoi-dau", upper: "phat-trien" },
+    { lower: "phat-trien", upper: "cao-cap" },
+  ];
+
+  const ladder = rungs
+    .map(({ lower, upper }) => {
+      const low = PACKS.find((p) => p.id === lower);
+      const up = PACKS.find((p) => p.id === upper);
+      const option = espaceGestion?.priceByPack?.[lower];
+      if (!low?.price || !up?.price || !option) return null;
+
+      const total = low.price + option;
+      const gap = up.price - total;
+      // L'argument ne tient que si le palier supérieur coûte à peine plus.
+      // Au-delà de 10 % d'écart, on se tait plutôt que de forcer le trait.
+      if (gap <= 0 || gap > up.price * 0.1) return null;
+
+      const optionName = tr(espaceGestion!.label, locale);
+      const included = tr(up.gridName, locale);
+      return {
+        vi: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + tùy chọn « ${optionName} » (${formatVnd(option)}) = ${formatVnd(total)}. Trong khi ${included} có giá ${formatVnd(up.price)} — chỉ hơn ${formatVnd(gap)} — và đổi lại là TOÀN BỘ những gì gói đó có.`,
+        en: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + the « ${optionName} » option (${formatVnd(option)}) = ${formatVnd(total)}. ${included} costs ${formatVnd(up.price)} — just ${formatVnd(gap)} more — and gives EVERYTHING that tier contains instead.`,
+        fr: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + l'option « ${optionName} » (${formatVnd(option)}) = ${formatVnd(total)}. ${included} coûte ${formatVnd(up.price)} — soit ${formatVnd(gap)} de plus — et apporte à la place TOUT ce que ce palier contient.`,
+      }[locale];
+    })
+    .filter(Boolean) as string[];
+
+  if (ladder.length) {
+    chunks.push({
+      id: "escalier",
+      topic: "pack",
+      locale,
+      title: l.ladderTitle,
+      body: [
+        ...ladder,
+        {
+          vi: "Lưu ý cho đúng: Phát Triển vẫn CHƯA bao gồm « Tự sửa nội dung » — phép tính so sánh giá, không phải nội dung. Ngược lại, Cao Cấp thì ĐÃ bao gồm sẵn.",
+          en: "One precision, to stay honest: Phát Triển still does NOT include « self-service editing » — the arithmetic compares prices, not contents. Cao Cấp, on the other hand, does include it.",
+          fr: "Une précision, pour rester honnête : Phát Triển n'inclut TOUJOURS PAS « l'espace de gestion » — le calcul compare des prix, pas des contenus. Cao Cấp, lui, l'inclut bel et bien.",
+        }[locale],
+      ].join("\n"),
+      keywords: ["escalier", "comparaison", "so sanh gia", "chenh lech", "difference de prix", "upgrade", "len goi", "monter", "vaut mieux", "worth it"],
+      boost: 1.2,
+    });
+  }
 
   chunks.push({
     id: "non-inclus",
@@ -512,6 +622,7 @@ function buildChunks(locale: Locale): Chunk[] {
       body: tr(entry.answer, locale),
       keywords: entry.keywords,
       boost: 1.15,
+      ...(entry.direct === false ? { direct: false as const } : {}),
     });
   }
 

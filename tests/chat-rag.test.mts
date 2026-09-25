@@ -135,9 +135,23 @@ const CASES: { q: string; locale: Locale; expect: string[] }[] = [
   { q: "CMS pour éditer le contenu moi-même", locale: "fr", expect: ["faq:modifier-moi-meme", "pack:cao-cap"] },
 ];
 
+/**
+ * Reproduit exactement la sélection de `route.ts` : mêmes candidats, même
+ * seuil, même plafond, même cohérence des paliers. L'assertion porte donc sur
+ * ce que le modèle a RÉELLEMENT sous les yeux — pas sur une place dans un
+ * classement intermédiaire, qui ne veut rien dire pour la réponse finale.
+ */
+function injected(q: string, locale: Locale) {
+  const top = search(q, locale, 12)
+    .filter((h) => h.score >= 0.25)
+    .slice(0, 5)
+    .map((h) => h.chunk);
+  return withPackCoherence(top, locale, q).map((c) => c.id);
+}
+
 for (const { q, locale, expect } of CASES) {
   test(`recherche [${locale}] « ${q.slice(0, 46)} »`, () => {
-    const ids = search(q, locale, 3).map((h) => h.chunk.id);
+    const ids = injected(q, locale);
     assert.ok(
       ids.some((id) => expect.includes(id)),
       `attendu l'un de ${expect.join(" | ")}, obtenu ${ids.join(", ") || "rien"}`,
@@ -177,10 +191,21 @@ test("prompt : les extraits récupérés sont injectés, les règles restent en 
 });
 
 test("prompt : le RAG divise la taille du prompt par deux au moins", () => {
-  // Injecter tout le corpus ferait un prompt de 26 000 caractères à chaque
-  // message. Mesuré sur six questions courantes, la version récupérée tient
-  // entre 6 000 et 10 000, et jusqu'à ~12 500 sur une question de paliers, où
-  // `withPackCoherence` ajoute les quatre packs d'un coup.
+  // Injecter tout le corpus ferait un prompt de 32 000 caractères à chaque
+  // message. La version récupérée tient entre 6 000 et 15 000 : le haut de la
+  // fourchette est atteint sur les questions de paliers, où les quatre fiches
+  // entrent ensemble, argumentaire compris.
+  //
+  // La borne a monté de 14 000 à 18 000 le jour où l'assistant est devenu
+  // commercial : méthode de vente dans le prompt (~2 100 caractères), et
+  // argumentaire attaché à chaque fiche de palier. Une question qui nomme un
+  // métier ou un palier coûte désormais ~16 500 caractères contre ~11 000 —
+  // c'est le prix d'une recommandation argumentée plutôt que d'une liste.
+  //
+  // Ce que ça ne touche pas : une question de FAQ reste à ~6 400, et la
+  // majorité d'entre elles ne déclenche aucun appel (cache, réponse directe).
+  // L'invariant qui compte — rester sous la moitié du corpus complet — tient
+  // toujours et est vérifié juste en dessous.
   const everything = buildSystemPrompt("fr", corpus("fr")).length;
   const chunks = withPackCoherence(
     search("je veux vendre en ligne avec livraison", "fr", 12)
@@ -190,6 +215,6 @@ test("prompt : le RAG divise la taille du prompt par deux au moins", () => {
     "fr",
   );
   const size = buildSystemPrompt("fr", chunks).length;
-  assert.ok(size < 14_000, `prompt de ${size} caractères`);
+  assert.ok(size < 18_000, `prompt de ${size} caractères`);
   assert.ok(size < everything / 2, `${size} n'est pas la moitié de ${everything}`);
 });

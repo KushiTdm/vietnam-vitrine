@@ -327,6 +327,38 @@ export function scrubResponse(text: string, contactHint: string): string {
   return out;
 }
 
+/**
+ * Prestataires que le modèle cite de lui-même — registrars et hébergeurs —
+ * alors que trois consignes le lui interdisent : la règle du prompt, la phrase
+ * « Neuraweb ne recommande aucun registrar » écrite dans l'extrait, et
+ * l'interdiction générale de nommer une société tierce.
+ *
+ * À l'essai, « Le nom de domaine, je l'achète où ? » a produit « Namecheap,
+ * GoDaddy ou VietDomain » — les deux premiers existent et ne sont pas nos
+ * partenaires, le troisième n'existe pas du tout. Un commerçant qui le cherche
+ * tombe sur rien, ou pire. Une consigne ne suffit pas pour ça : il faut un
+ * test sur la sortie.
+ *
+ * Liste courte et bornée par des frontières de mots : on ne bloque que des
+ * marques de domaine et d'hébergement, jamais un mot qu'un visiteur pourrait
+ * employer pour son propre commerce.
+ */
+const PROVIDER_NAMES = [
+  "namecheap", "godaddy", "gandi", "ovh", "ovhcloud", "hostinger", "bluehost",
+  "dreamhost", "porkbun", "cloudflare", "vercel", "netlify", "hostgator",
+  "mat bao", "matbao", "pa vietnam", "pavietnam", "tenten", "nhan hoa",
+  "nhanhoa", "azdigi", "vietnix", "vinahost", "viettel idc", "vietdomain",
+];
+
+/** La réponse nomme-t-elle un prestataire tiers ? */
+export function namesForbiddenProvider(text: string): string | null {
+  const haystack = normalize(text);
+  for (const name of PROVIDER_NAMES) {
+    if (new RegExp(`\\b${name.replace(/ /g, "\\s+")}\\b`).test(haystack)) return name;
+  }
+  return null;
+}
+
 // ────────────────────────────────────────────────────────────
 // Nettoyage périodique
 // ────────────────────────────────────────────────────────────

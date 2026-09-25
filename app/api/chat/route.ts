@@ -38,6 +38,7 @@ import {
   getClientIp,
   getOffTopicStrikes,
   isIpBlocked,
+  namesForbiddenProvider,
   noteSaturation,
   normalize,
   rateLimit,
@@ -472,16 +473,22 @@ export async function POST(request: NextRequest) {
     const query = `${previousQuestion} ${message}`.trim();
     const candidates = search(query, locale, RAG_CANDIDATES).filter((h) => h.score >= RAG_MIN_SCORE);
     const ranked = await rerank(query, locale, candidates);
-    const chunks = withPackCoherence(ranked.slice(0, RAG_TOP_K).map((h) => h.chunk), locale);
+    const chunks = withPackCoherence(ranked.slice(0, RAG_TOP_K).map((h) => h.chunk), locale, query);
 
     // 💬 La meilleure réponse est parfois déjà écrite. Voir la constante
     // `FAQ_DIRECT_MAX_RUNNER_UP` : question de premier tour, courte, tombant
     // franchement sur une entrée de la FAQ → on sert ce texte, tel quel.
     const best = ranked[0];
+    // Le visiteur a nommé son métier ⇒ c'est une conversation de vente, pas
+    // une consultation de FAQ. Observé : « J'ai un petit café à Đống Đa »
+    // renvoyait le paragraphe « qui est Neuraweb » — une occasion perdue.
+    const sellingContext = ranked.some((h) => h.chunk.topic === "metier");
     if (
       process.env.CHAT_FAQ_DIRECT !== "0" &&
       firstTurn &&
       best?.chunk.topic === "faq" &&
+      best.chunk.direct !== false &&
+      !sellingContext &&
       message.length <= FAQ_DIRECT_MAX_QUESTION_LENGTH &&
       (ranked[1]?.score ?? 0) <= FAQ_DIRECT_MAX_RUNNER_UP
     ) {
@@ -541,13 +548,25 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const answer = scrubResponse(content, t.contactHint);
+    let answer = scrubResponse(content, t.contactHint);
+    let intent: ChatIntent = "normal";
     const sources = chunks.map((c) => c.id);
+
+    // 🛡️ Dernier filet : si la réponse nomme un prestataire tiers, on sert
+    // l'extrait le mieux classé à la place. Le texte écrit à la main est de
+    // toute façon la meilleure réponse à ce genre de question — c'est
+    // exactement ce que le modèle aurait dû reformuler.
+    const provider = namesForbiddenProvider(answer);
+    if (provider && chunks[0]) {
+      console.warn(`[chat] réponse remplacée : elle nommait « ${provider} »`);
+      answer = chunks[0].body;
+      intent = "faq";
+    }
     // Le cache ne retient que les premiers tours : au-delà, la réponse dépend
     // de ce qui précède et ne se réutilise pas. Un hors-sujet n'est pas gardé.
     if (firstTurn && !OFF_TOPIC_MARKER.test(raw)) setCached(message, locale, answer, sources);
 
-    return reply(answer, "normal", { sources });
+    return reply(answer, intent, { sources });
   } catch (error) {
     // `AbortSignal.timeout` remonte ici comme une TimeoutError : même traitement.
     console.error("[chat] erreur:", error);

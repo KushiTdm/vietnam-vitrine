@@ -28,6 +28,15 @@ export type FaqEntry = {
   keywords?: string[];
   /** Réponse déduite, pas documentée — à valider. */
   confirm?: true;
+  /**
+   * `false` interdit de servir cette réponse telle quelle, sans passer par le
+   * modèle. À mettre sur les entrées qui sont des OCCASIONS DE VENTE : « mes
+   * clients peuvent-ils réserver ? » appelle une recommandation de palier avec
+   * son prix, pas un paragraphe figé. Les entrées administratives (domaine,
+   * paiement, garantie) n'ont rien à gagner d'un détour par le modèle : leur
+   * texte écrit à la main est déjà la meilleure réponse possible.
+   */
+  direct?: false;
 };
 
 export const FAQ: FaqEntry[] = [
@@ -119,9 +128,9 @@ export const FAQ: FaqEntry[] = [
       fr: "Et le nom de domaine ?",
     },
     answer: {
-      vi: "Anh/chị tự mua, đứng tên anh/chị, ở nhà cung cấp anh/chị chọn — khoảng 300.000₫/năm cho .com, cao hơn cho .vn. Lưu ý: tên miền .vn yêu cầu giấy tờ tùy thân Việt Nam hoặc giấy phép kinh doanh. Neuraweb không cầm tiền tên miền của anh/chị.",
-      en: "You buy it yourself, in your name, from the registrar of your choice — around 300,000₫/year for a .com, more for a .vn. Note that a .vn domain requires Vietnamese ID or a registered business. Neuraweb never handles your domain payment.",
-      fr: "Vous l'achetez vous-même, à votre nom, chez le registrar de votre choix — environ 300.000₫/an pour un .com, davantage pour un .vn. À savoir : un domaine .vn exige une pièce d'identité vietnamienne ou une entreprise enregistrée. Neuraweb n'encaisse jamais le prix du domaine.",
+      vi: "Anh/chị tự mua, đứng tên anh/chị, ở nhà cung cấp anh/chị tự chọn — khoảng 300.000₫/năm cho .com, cao hơn cho .vn. Neuraweb không giới thiệu nhà cung cấp nào cụ thể. Lưu ý: tên miền .vn yêu cầu giấy tờ tùy thân Việt Nam hoặc giấy phép kinh doanh. Neuraweb không cầm tiền tên miền của anh/chị.",
+      en: "You buy it yourself, in your name, from the registrar of your own choosing — around 300,000₫/year for a .com, more for a .vn. Neuraweb does not recommend any particular registrar. Note that a .vn domain requires Vietnamese ID or a registered business. Neuraweb never handles your domain payment.",
+      fr: "Vous l'achetez vous-même, à votre nom, chez le registrar de votre choix — environ 300.000₫/an pour un .com, davantage pour un .vn. Neuraweb ne recommande aucun registrar en particulier. À savoir : un domaine .vn exige une pièce d'identité vietnamienne ou une entreprise enregistrée. Neuraweb n'encaisse jamais le prix du domaine.",
     },
     keywords: ["ten mien", "domain", "domaine", ".vn", ".com", "registrar"],
   },
@@ -159,6 +168,7 @@ export const FAQ: FaqEntry[] = [
   },
   {
     id: "reservation",
+    direct: false,
     question: {
       vi: "Khách đặt lịch trên web được không?",
       en: "Can customers book from the site?",
@@ -173,6 +183,7 @@ export const FAQ: FaqEntry[] = [
   },
   {
     id: "paiement-en-ligne",
+    direct: false,
     question: {
       vi: "Bán hàng và nhận tiền trên web được không?",
       en: "Can I sell and take payment on the site?",
@@ -191,6 +202,7 @@ export const FAQ: FaqEntry[] = [
   },
   {
     id: "modifier-moi-meme",
+    direct: false,
     question: {
       vi: "Tôi tự sửa giá và nội dung được không?",
       en: "Can I edit prices and content myself?",
@@ -234,6 +246,7 @@ export const FAQ: FaqEntry[] = [
   },
   {
     id: "facebook",
+    direct: false,
     question: {
       vi: "Tôi có Facebook rồi, cần web làm gì?",
       en: "I already have a Facebook page — why a website?",
@@ -248,6 +261,7 @@ export const FAQ: FaqEntry[] = [
   },
   {
     id: "demos",
+    direct: false,
     question: {
       vi: "Có xem thử được không?",
       en: "Can I see a real example?",
@@ -286,10 +300,14 @@ export const FAQ: FaqEntry[] = [
       fr: "Qui est Neuraweb ?",
     },
     answer: {
-      vi: "Một studio thiết kế web nhỏ tại Hà Nội, do Nacer sáng lập và trực tiếp làm. Làm việc bằng tiếng Việt, tiếng Anh và tiếng Pháp, chuyên cho quán cà phê, salon, cửa hàng, nhà hàng và homestay trong thành phố.",
-      en: "A small web studio in Hà Nội, founded and run hands-on by Nacer. It works in Vietnamese, English and French, for the city's cafés, salons, shops, restaurants and homestays.",
-      fr: "Un petit studio web à Hanoï, fondé et mené par Nacer lui-même. Il travaille en vietnamien, en anglais et en français, pour les cafés, salons, boutiques, restaurants et homestays de la ville.",
+      vi: "Một studio thiết kế web nhỏ tại Hà Nội, do Nacer sáng lập và điều hành: anh là giám đốc (CEO) và cũng là người trực tiếp thiết kế, lập trình. Làm việc bằng tiếng Việt, tiếng Anh và tiếng Pháp, chuyên cho quán cà phê, salon, cửa hàng, nhà hàng và homestay trong thành phố.",
+      en: "A small web studio in Hà Nội, founded and run by Nacer, its CEO, who designs and builds the sites himself. It works in Vietnamese, English and French, for the city's cafés, salons, shops, restaurants and homestays.",
+      fr: "Un petit studio web à Hanoï, fondé et dirigé par Nacer, son CEO, qui conçoit et développe lui-même les sites. Il travaille en vietnamien, en anglais et en français, pour les cafés, salons, boutiques, restaurants et homestays de la ville.",
     },
-    keywords: ["neuraweb", "nacer", "ai lam", "who", "qui", "agence", "studio", "equipe"],
+    keywords: [
+      "neuraweb", "nacer", "ai lam", "who", "qui", "agence", "studio", "equipe",
+      "ceo", "giam doc", "dieu hanh", "dirigeant", "directeur", "patron",
+      "fondateur", "founder", "boss", "chu doanh nghiep",
+    ],
   },
 ];
