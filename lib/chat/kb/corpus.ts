@@ -500,12 +500,17 @@ function buildChunks(locale: Locale): Chunk[] {
       .map((f) => tr(f.label, locale))
       .join(" · ");
 
+    // Chaque démo avec le chemin de SA page : `/metiers/<métier>/<palier>`,
+    // l'écran qui l'affiche en direct. Sans ce chemin, l'assistant nommait
+    // « Phin » et « Ngõ Nhỏ » sans pouvoir dire où les voir — et il ne peut
+    // pas donner l'adresse brute des démos, qui porte le nom de l'hébergeur.
     const demos = DEMOS.filter((d) => d.vertical === vertical.id && d.status === "live")
       .map((d) => {
         const pack = PACKS.find((p) => p.id === d.pack);
-        return `${d.businessName} (${pack ? tr(pack.gridName, locale) : d.pack}, ${d.district})`;
+        const label = `${d.businessName} — ${pack ? tr(pack.gridName, locale) : d.pack}, ${d.district}`;
+        return `${label} → ${path(`/metiers/${vertical.slug}/${d.pack}`, locale)}`;
       })
-      .join(" · ");
+      .join("\n    ");
 
     chunks.push({
       id: `metier:${vertical.id}`,
@@ -671,6 +676,7 @@ function buildChunks(locale: Locale): Chunk[] {
         `⛔ ${tr(service.notForWhom, locale)}`,
         `${price} · ${l.serviceLead} : ${tr(service.leadTime, locale)}`,
         l.serviceQuote,
+        `${l.page} : ${path(`/services/${service.slug}`, locale)}`,
       ].join("\n"),
       keywords: [
         service.id,

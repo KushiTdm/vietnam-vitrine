@@ -1,3 +1,5 @@
+import { agency } from "@/app/[locale]/(vitrine)/showcase.config";
+
 /**
  * Garde-fous du chatbot public (`app/api/chat`).
  *
@@ -265,9 +267,51 @@ const EMAIL = /[\w.+-]+@[\w-]+\.[\w.-]+/g;
 /** Lien markdown : `[libellé](cible)`. */
 const MD_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 /** Adresse absolue écrite en clair. */
-const BARE_URL = /\bhttps?:\/\/[^\s)<>"']+/g;
-/** Nom de domaine sans protocole — liste de TLD fermée pour éviter les faux positifs. */
-const BARE_DOMAIN = /\b[a-z0-9][a-z0-9-]*\.(?:vn|com|fr|net|org|io|me)(?:\.[a-z]{2})?(?:\/[^\s),.]*)?/gi;
+const ABSOLUTE_URL = /\bhttps?:\/\/[^\s)<>"']+/g;
+/**
+ * Nom d'hôte sans protocole, sous-domaines compris. Le `(?:label\.)+` compte :
+ * l'ancienne version ne prenait que les deux derniers labels et laissait un
+ * moignon — « hanoi-demos-site.san3neb. » — après nettoyage.
+ */
+const BARE_HOST = /\b(?:[a-z0-9][a-z0-9-]*\.)+(?:vn|com|fr|net|org|io|me|dev|app|co)(?:\.[a-z]{2})?(?:\/[^\s),.]*)?/gi;
+
+/**
+ * Le domaine du site lui-même — le SEUL que l'assistant ait le droit d'écrire.
+ *
+ * Sans cette exception, le filtre anti-domaines-inventés détruisait l'adresse
+ * légitime : « Tout est sur https://vn.neuraweb.fr/packs » ressortait en
+ * « Tout est sur ». Pire, une forme sans protocole laissait « Voir vn. ».
+ *
+ * Une adresse du site est donc ramenée à son CHEMIN : `/packs` plutôt que
+ * `https://vn.neuraweb.fr/packs`. C'est plus court, ça reste juste si le
+ * domaine change, et le widget en fait un lien cliquable — ce qu'il ne fait
+ * pas d'une URL absolue.
+ */
+const OWN_HOST = (() => {
+  try {
+    return new URL(agency.url).host.toLowerCase();
+  } catch {
+    return "";
+  }
+})();
+
+/**
+ * Une adresse : ramenée à son chemin si c'est la nôtre, supprimée sinon.
+ *
+ * Le « sinon » couvre aussi l'hôte des démos, qui porte le nom de son
+ * hébergeur : le laisser passer contredirait la règle de ne jamais nommer le
+ * prestataire d'infrastructure. Les démos se montrent par leur page du site
+ * (`/metiers/<métier>/<palier>`), qui les affiche en direct.
+ */
+function ownPathOrDrop(match: string): string {
+  try {
+    const url = new URL(match.startsWith("http") ? match : `https://${match}`);
+    if (OWN_HOST && url.host.toLowerCase() === OWN_HOST) return url.pathname + url.search;
+    return "";
+  } catch {
+    return "";
+  }
+}
 /**
  * Chemin interne cité dans une réponse. Le `(?<=...)` exige un début de ligne,
  * une espace ou une ouvrante juste avant : « 5 USD/mois » ou « GHTK/GHN » ne
@@ -301,10 +345,12 @@ export function scrubResponse(text: string, contactHint: string): string {
   // chemin, le reste à son libellé ; les adresses absolues restantes sautent.
   // Les chemins internes (`/packs`, `/fr/metiers/...`) sont préservés : ce sont
   // les seuls liens que le widget rend cliquables.
-  out = out.replace(MD_LINK, (_m, label: string, href: string) =>
-    href.startsWith("/") ? href : label,
-  );
-  out = out.replace(BARE_URL, "").replace(BARE_DOMAIN, "");
+  out = out.replace(MD_LINK, (_m, label: string, href: string) => {
+    if (href.startsWith("/")) return href;
+    const own = ownPathOrDrop(href);
+    return own || label;
+  });
+  out = out.replace(ABSOLUTE_URL, ownPathOrDrop).replace(BARE_HOST, ownPathOrDrop);
   out = out.replace(INTERNAL_PATH, (match) => (ALLOWED_PATH.test(match.trim()) ? match : ""));
   out = out.replace(/[ \t]{2,}/g, " ").replace(/ +([,.;:!?])/g, "$1");
 

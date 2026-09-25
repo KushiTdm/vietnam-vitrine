@@ -67,6 +67,25 @@ test("corpus : chaque pack est présent avec son prix exact", () => {
   }
 });
 
+test("corpus : chaque démo publiée porte l'adresse de sa page", () => {
+  // Nommer « Phin » sans dire où le voir ne sert à rien, et l'adresse brute
+  // de la démo est interdite (elle porte le nom de l'hébergeur).
+  for (const locale of LOCALES) {
+    const cafe = corpus(locale).find((c) => c.id === "metier:cafe")!;
+    assert.ok(
+      /\/metiers\/quan-ca-phe\/(khoi-dau|phat-trien|cao-cap)/.test(cafe.body),
+      `aucun chemin de démo en ${locale}`,
+    );
+  }
+});
+
+test("corpus : chaque prestation porte l'adresse de sa page", () => {
+  for (const service of SERVICES) {
+    const chunk = corpus("fr").find((c) => c.id === `service:${service.id}`)!;
+    assert.ok(chunk.body.includes(`/services/${service.slug}`), `chemin absent : ${service.id}`);
+  }
+});
+
 test("corpus : chaque entrée de la FAQ devient un extrait", () => {
   const ids = corpus("fr").map((c) => c.id);
   for (const entry of FAQ) assert.ok(ids.includes(`faq:${entry.id}`), `FAQ absente : ${entry.id}`);

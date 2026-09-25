@@ -128,6 +128,20 @@ test("scrubResponse : un lien markdown interne est réduit à son chemin cliquab
   assert.ok(!out.includes("]("));
 });
 
+test("scrubResponse : l'adresse du site est ramenée à son chemin, pas supprimée", () => {
+  // Le filtre anti-domaines-inventés détruisait l'adresse légitime :
+  // « Tout est sur https://vn.neuraweb.fr/packs » ressortait « Tout est sur ».
+  assert.equal(scrubResponse("Tout est sur https://vn.neuraweb.fr/packs", HINT), "Tout est sur /packs");
+  assert.equal(scrubResponse("Voir vn.neuraweb.fr/services/tich-hop-ai", HINT), "Voir /services/tich-hop-ai");
+});
+
+test("scrubResponse : l'adresse des démos ne sort pas — elle nomme l'hébergeur", () => {
+  // Les démos se montrent par leur page du site, qui les affiche en direct.
+  const out = scrubResponse("La démo est sur hanoi-demos-site.san3neb.workers.dev/demo/cafe", HINT);
+  assert.ok(!out.includes("workers.dev"));
+  assert.ok(!out.includes("hanoi-demos-site"), `moignon laissé : ${out}`);
+});
+
 test("scrubResponse : un chemin interne inventé disparaît, les vrais restent", () => {
   // Cas observé : le modèle traduit le nom de la page et sort « /bang-gia »,
   // qui n'existe pas. Les routes réelles de la vitrine, elles, passent.
