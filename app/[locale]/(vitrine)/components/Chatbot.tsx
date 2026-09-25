@@ -40,7 +40,7 @@ const TEASER_DELAY_MS = 8_000;
 const MAX_INPUT = 500;
 
 /** Chemins internes rendus cliquables dans une réponse — liste fermée exprès. */
-const RICH_TOKEN = /(\*\*[^*]+\*\*)|((?:\/(?:en|fr))?\/(?:packs|qua-tang|metiers)[\w/-]*)/g;
+const RICH_TOKEN = /(\*\*[^*]+\*\*)|((?:\/(?:en|fr))?\/(?:packs|qua-tang|metiers|services)[\w/-]*)/g;
 /**
  * Le prompt interdit les liens markdown, mais un modèle finit toujours par en
  * écrire un. On garde le chemin s'il est interne (il sera rendu cliquable

@@ -29,6 +29,7 @@ import {
   OPTIONS,
   PACKS,
   PLANNED_VERTICALS,
+  SERVICES,
   PROCESS,
   VERTICALS,
   approxUsd,
@@ -53,7 +54,6 @@ import { agency } from "@/app/[locale]/(vitrine)/showcase.config";
 import { UI } from "@/app/[locale]/(vitrine)/lib/ui";
 import { FAQ } from "./faq";
 import { SELLING } from "./selling";
-import { SERVICES } from "./services";
 import { TECH } from "./tech";
 import type { Chunk } from "./types";
 
@@ -664,8 +664,11 @@ function buildChunks(locale: Locale): Chunk[] {
       title: l.serviceTitle(tr(service.name, locale)),
       body: [
         tr(service.promise, locale),
-        tr(service.examples, locale),
+        service.bullets.map((b) => `· ${tr(b, locale)}`).join("\n"),
         `${l.serviceFor} : ${tr(service.forWhom, locale)}`,
+        // Le « pas pour vous » entre dans l'extrait : c'est lui qui empêche
+        // l'assistant de vendre une application à un commerce de passage.
+        `⛔ ${tr(service.notForWhom, locale)}`,
         `${price} · ${l.serviceLead} : ${tr(service.leadTime, locale)}`,
         l.serviceQuote,
       ].join("\n"),

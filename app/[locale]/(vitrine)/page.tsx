@@ -1,6 +1,6 @@
 "use client";
 
-import { PACKS, PLANNED_VERTICALS, VERTICALS } from "@/lib/registry";
+import { PACKS, PLANNED_VERTICALS, SERVICES, VERTICALS, approxUsd, formatVnd } from "@/lib/registry";
 import { useLanguage, LocalizedLink as Link } from "./components/LanguageProvider";
 import PackCard from "./components/PackCard";
 import VerticalTile, { PlannedTile } from "./components/VerticalTile";
@@ -116,6 +116,55 @@ export default function Home() {
               index={VERTICALS.length + i}
             />
           ))}
+        </div>
+      </section>
+
+      {/* ────────────── Au-delà du site ──────────────
+          Placée APRÈS les métiers, jamais avant : ces trois prestations se
+          vendent à quelqu'un qui a déjà un site, ou qui vient d'en choisir un.
+          Les mettre plus haut détournerait un prospect venu pour une vitrine. */}
+      <section id="services" className="border-t border-line bg-white/60">
+        <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 md:py-20">
+          <h2 className="font-display text-3xl md:text-4xl" data-reveal>
+            {t("servicesTitle")}
+          </h2>
+          <p
+            className="mt-2 max-w-xl text-[16px] text-muted"
+            data-reveal
+            style={{ ["--d" as string]: "60ms" }}
+          >
+            {t("servicesLead")}
+          </p>
+
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {SERVICES.map((service, i) => (
+              <Link
+                key={service.id}
+                href={`/services/${service.slug}`}
+                className="group flex flex-col rounded-2xl border border-line bg-ground p-6 transition-colors hover:border-ink"
+                data-reveal
+                style={{ ["--d" as string]: `${i * 60}ms` }}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-12 w-12 items-center justify-center rounded-xl text-[22px]"
+                  style={{ background: `${service.accent}1a` }}
+                >
+                  {service.icon}
+                </span>
+                <h3 className="mt-4 font-display text-[22px] leading-tight">{tr(service.name)}</h3>
+                <p className="mt-1 text-[15px] leading-snug text-muted">{tr(service.tagline)}</p>
+                <p className="mt-4 text-[15px]">
+                  <span className="text-muted">{t("from")} </span>
+                  <span className="font-medium">{formatVnd(service.floor)}</span>
+                  <span className="text-muted"> {approxUsd(service.floor)}</span>
+                </p>
+                <span className="mt-4 text-[14px] font-medium text-ink underline underline-offset-4 group-hover:opacity-70">
+                  {t("seeService")}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
     </>

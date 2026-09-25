@@ -24,7 +24,7 @@ import { corpus } from "../lib/chat/kb/corpus.ts";
 import { FAQ } from "../lib/chat/kb/faq.ts";
 import { search, withPackCoherence } from "../lib/chat/retrieval.ts";
 import { buildSystemPrompt } from "../lib/chat/context.ts";
-import { SERVICES } from "../lib/chat/kb/services.ts";
+import { SERVICES } from "../lib/registry/services.ts";
 import { ENTERPRISE_FLOOR, PACKS } from "../lib/registry/packs.ts";
 import { formatVnd } from "../lib/registry/format.ts";
 import type { Locale } from "../lib/registry/types.ts";

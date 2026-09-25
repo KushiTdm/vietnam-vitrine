@@ -16,6 +16,7 @@
 import {
   ENTERPRISE_FLOOR,
   PACKS,
+  SERVICES,
   approxUsd,
   formatVnd,
   tr,
@@ -209,7 +210,14 @@ function basePrompt(locale: Locale): string {
   if (cached) return cached;
 
   const c = COPY[locale];
-  const links = [path("/", locale), path("/packs", locale), path("/qua-tang", locale)].join(" · ");
+  const links = [
+    path("/", locale),
+    path("/packs", locale),
+    path("/qua-tang", locale),
+    // Chaque prestation a désormais sa page : sans ces chemins, l'assistant
+    // décrivait l'offre sans pouvoir dire où la lire.
+    ...SERVICES.map((s) => path(`/services/${s.slug}`, locale)),
+  ].join(" · ");
 
   const prompt = [
     c.persona,

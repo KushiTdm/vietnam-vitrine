@@ -10,6 +10,7 @@ export default function SiteHeader() {
   const links = [
     { href: "/#metiers", label: t("navMetiers") },
     { href: "/packs", label: t("navPacks") },
+    { href: "/#services", label: t("navServices") },
     { href: "/#quy-trinh", label: t("navProcess") },
   ];
 

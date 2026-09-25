@@ -131,10 +131,16 @@ test("scrubResponse : un lien markdown interne est réduit à son chemin cliquab
 test("scrubResponse : un chemin interne inventé disparaît, les vrais restent", () => {
   // Cas observé : le modèle traduit le nom de la page et sort « /bang-gia »,
   // qui n'existe pas. Les routes réelles de la vitrine, elles, passent.
-  const out = scrubResponse("Voir /bang-gia ou /packs ou /fr/metiers/quan-ca-phe", HINT);
+  const out = scrubResponse(
+    "Voir /bang-gia ou /packs ou /fr/metiers/quan-ca-phe ou /services/tich-hop-ai",
+    HINT,
+  );
   assert.ok(!out.includes("/bang-gia"));
   assert.ok(out.includes("/packs"));
   assert.ok(out.includes("/fr/metiers/quan-ca-phe"));
+  // Les pages de prestations existent depuis qu'elles sont dans le registre :
+  // les filtrer reviendrait à empêcher l'assistant d'y renvoyer.
+  assert.ok(out.includes("/services/tich-hop-ai"));
 });
 
 test("scrubResponse : une barre oblique qui n'est pas un chemin est épargnée", () => {

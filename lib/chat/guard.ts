@@ -279,7 +279,7 @@ const INTERNAL_PATH = /(?<=^|[\s(«"'*])\/[a-z][\w-]*(?:\/[\w-]+)*\/?/gim;
  * traduction de la page (« /bang-gia » pour la grille de prix, en vietnamien) :
  * plausibles, cliquables, et en 404. Tout ce qui n'est pas là-dedans saute.
  */
-const ALLOWED_PATH = /^\/(?:(?:en|fr)\/)?(?:packs|qua-tang|metiers(?:\/[\w-]+){0,2})\/?$/;
+const ALLOWED_PATH = /^\/(?:(?:en|fr)\/)?(?:packs|qua-tang|metiers(?:\/[\w-]+){0,2}|services(?:\/[\w-]+)?)\/?$/;
 
 /**
  * Retire de la réponse tout ce qui ne doit jamais être écrit par l'assistant :
