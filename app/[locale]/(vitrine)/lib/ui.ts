@@ -148,10 +148,10 @@ export const UI: Record<Locale, Dict> = {
     chatOpen: "Mở khung chat tư vấn",
     chatTeaser: "Chưa biết chọn gói nào?",
     chatTitle: "Trợ lý Neuraweb",
-    chatSubtitle: "Chỉ tư vấn về các gói website",
+    chatSubtitle: "Website, app, tự động hóa, AI",
     chatGreeting:
       "Xin chào 👋 Mình là trợ lý của Neuraweb. Mình tư vấn về các gói website, giá và thời gian giao. Anh/chị đang làm ngành gì ạ?",
-    chatPlaceholder: "Nhập câu hỏi về gói website…",
+    chatPlaceholder: "Hỏi về dịch vụ của Neuraweb…",
     chatSend: "Gửi",
     chatClose: "Đóng",
     chatTyping: "Đang soạn câu trả lời…",
@@ -164,7 +164,8 @@ export const UI: Record<Locale, Dict> = {
     navServices: "Dịch vụ khác",
     servicesEyebrow: "Ngoài website",
     servicesTitle: "Không chỉ có website",
-    servicesLead: "Ba việc làm thêm, khi website đã chạy và vấn đề nằm ở chỗ khác.",
+    servicesLead:
+      "Ba việc làm thêm cho mọi loại hình kinh doanh — quán ăn, phòng khám, trường học, công ty dịch vụ, nhà xuất khẩu — khi vấn đề nằm ở chỗ khác.",
     seeService: "Xem chi tiết",
     serviceProblems: "Chuyện thường gặp",
     serviceWhat: "Anh/chị nhận được gì",
@@ -174,6 +175,17 @@ export const UI: Record<Locale, Dict> = {
     serviceQuote: "Giá chính xác chốt sau một buổi trao đổi 15 phút — tùy phạm vi công việc.",
     serviceLead: "Thời gian",
     serviceFaq: "Câu hỏi hay gặp",
+    serviceTiersLead:
+      "Ba mức, từ việc nhỏ nhất đến hệ thống đầy đủ. Mức nào cũng bắt đầu bằng cùng một buổi trao đổi 15 phút.",
+    serviceCasesTitle: "Ví dụ cụ thể",
+    serviceCasesNote:
+      "Đây là những tình huống điển hình để anh/chị dễ hình dung — không phải lời chứng thực của khách hàng.",
+    serviceCaseSituation: "Tình huống",
+    serviceCaseBuilt: "Cách xử lý",
+    serviceProcessTitle: "Các bước thực hiện",
+    serviceProcessLead:
+      "Bốn bước. Thời gian tùy theo gói: mỗi gói ghi rõ thời gian ở phần Chi phí phía trên.",
+    imageIllustration: "Ảnh minh họa",
     // chatbot — blocage et prise de RDV
     chatWait: "Gửi lại sau {n} giây",
     chatBookPickDay: "Chọn ngày",
@@ -322,10 +334,10 @@ export const UI: Record<Locale, Dict> = {
     chatOpen: "Open the advice chat",
     chatTeaser: "Not sure which pack?",
     chatTitle: "Neuraweb assistant",
-    chatSubtitle: "Website packs only",
+    chatSubtitle: "Websites, apps, automation, AI",
     chatGreeting:
       "Hello 👋 I'm Neuraweb's assistant. I can help with our website packs, prices and lead times. What kind of business is it for?",
-    chatPlaceholder: "Ask about the website packs…",
+    chatPlaceholder: "Ask about our services…",
     chatSend: "Send",
     chatClose: "Close",
     chatTyping: "Writing a reply…",
@@ -338,7 +350,8 @@ export const UI: Record<Locale, Dict> = {
     navServices: "More services",
     servicesEyebrow: "Beyond the website",
     servicesTitle: "More than a website",
-    servicesLead: "Three things worth doing once the site runs and the problem sits elsewhere.",
+    servicesLead:
+      "Three things for any kind of business — a restaurant, a clinic, a school, a services firm, an exporter — when the problem sits elsewhere.",
     seeService: "See details",
     serviceProblems: "What usually goes wrong",
     serviceWhat: "What you get",
@@ -348,6 +361,16 @@ export const UI: Record<Locale, Dict> = {
     serviceQuote: "The exact figure is set after a 15-minute call — it depends on the scope.",
     serviceLead: "Lead time",
     serviceFaq: "Questions we get",
+    serviceTiersLead:
+      "Three levels, from the smallest job to the full system. Each starts with the same 15-minute call.",
+    serviceCasesTitle: "Concrete examples",
+    serviceCasesNote: "Typical situations to help you picture it — not customer testimonials.",
+    serviceCaseSituation: "The situation",
+    serviceCaseBuilt: "What we set up",
+    serviceProcessTitle: "How it goes",
+    serviceProcessLead:
+      "Four steps. Timing depends on the tier: each tier lists its lead time under Cost above.",
+    imageIllustration: "Illustration",
     // chatbot — throttling and booking
     chatWait: "Send again in {n}s",
     chatBookPickDay: "Pick a day",
@@ -499,10 +522,10 @@ export const UI: Record<Locale, Dict> = {
     chatOpen: "Ouvrir le chat de conseil",
     chatTeaser: "Vous hésitez entre deux packs ?",
     chatTitle: "Assistant Neuraweb",
-    chatSubtitle: "Uniquement sur les packs de sites",
+    chatSubtitle: "Sites, app, automatisation, IA",
     chatGreeting:
       "Bonjour 👋 Je suis l'assistant de Neuraweb. Je renseigne sur les packs, les prix et les délais. C'est pour quel type de commerce ?",
-    chatPlaceholder: "Une question sur les packs…",
+    chatPlaceholder: "Une question sur nos services…",
     chatSend: "Envoyer",
     chatClose: "Fermer",
     chatTyping: "Rédaction de la réponse…",
@@ -515,7 +538,8 @@ export const UI: Record<Locale, Dict> = {
     navServices: "Autres services",
     servicesEyebrow: "Au-delà du site",
     servicesTitle: "Plus qu'un site web",
-    servicesLead: "Trois chantiers utiles quand le site tourne et que le problème est ailleurs.",
+    servicesLead:
+      "Trois chantiers pour toute activité — restaurant, clinique, école, société de services, exportateur — quand le problème est ailleurs.",
     seeService: "Voir le détail",
     serviceProblems: "Ce qui coince",
     serviceWhat: "Ce que vous recevez",
@@ -525,6 +549,17 @@ export const UI: Record<Locale, Dict> = {
     serviceQuote: "Le montant exact se fixe après un échange de 15 minutes — il dépend du périmètre.",
     serviceLead: "Délai",
     serviceFaq: "Les questions qu'on nous pose",
+    serviceTiersLead:
+      "Trois niveaux, du plus petit chantier au système complet. Chacun commence par le même échange de 15 minutes.",
+    serviceCasesTitle: "Cas concrets",
+    serviceCasesNote:
+      "Des situations types pour vous aider à vous projeter — ce ne sont pas des témoignages de clients.",
+    serviceCaseSituation: "La situation",
+    serviceCaseBuilt: "Ce qu'on met en place",
+    serviceProcessTitle: "Comment ça se passe",
+    serviceProcessLead:
+      "Quatre étapes. La durée dépend de la formule : chacune affiche son délai dans « Le prix » plus haut.",
+    imageIllustration: "Illustration",
     // chatbot — blocage et prise de rendez-vous
     chatWait: "Renvoyer dans {n} s",
     chatBookPickDay: "Choisir un jour",

@@ -142,9 +142,9 @@ export const FAQ: FaqEntry[] = [
       fr: "Combien de langues sur le site ?",
     },
     answer: {
-      vi: "Khởi Đầu có một ngôn ngữ; thêm ngôn ngữ thứ hai là tùy chọn 1.500.000₫. Phát Triển, Cao Cấp và Doanh Nghiệp có tiếng Việt, tiếng Anh và tiếng Pháp. Dịch nội dung là một nghề riêng, không nằm trong gói sửa đổi.",
-      en: "Khởi Đầu ships with one language; a second one is a 1,500,000₫ option. Phát Triển, Cao Cấp and Doanh Nghiệp come in Vietnamese, English and French. Translating content is a trade of its own and is never counted as a light edit.",
-      fr: "Khởi Đầu est livré en une seule langue ; la seconde est une option à 1.500.000₫. Phát Triển, Cao Cấp et Doanh Nghiệp sont en vietnamien, anglais et français. La traduction est un métier, jamais une modification incluse.",
+      vi: "Khởi Đầu có một ngôn ngữ; thêm ngôn ngữ thứ hai là tùy chọn trả thêm (giá xem ở trang /packs). Phát Triển, Cao Cấp và Doanh Nghiệp có tiếng Việt, tiếng Anh và tiếng Pháp. Dịch nội dung là một nghề riêng, không nằm trong gói sửa đổi.",
+      en: "Khởi Đầu ships with one language; a second one is a paid option (price on the /en/packs page). Phát Triển, Cao Cấp and Doanh Nghiệp come in Vietnamese, English and French. Translating content is a trade of its own and is never counted as a light edit.",
+      fr: "Khởi Đầu est livré en une seule langue ; la seconde est une option payante (prix sur la page /fr/packs). Phát Triển, Cao Cấp et Doanh Nghiệp sont en vietnamien, anglais et français. La traduction est un métier, jamais une modification incluse.",
     },
     keywords: [
       "ngon ngu", "tieng anh", "english", "langue", "multilingue", "traduction", "dich",
@@ -209,9 +209,9 @@ export const FAQ: FaqEntry[] = [
       fr: "Puis-je modifier les prix et le contenu moi-même ?",
     },
     answer: {
-      vi: "Có sẵn trong Cao Cấp và Doanh Nghiệp. Với Khởi Đầu và Phát Triển, đó là tùy chọn trả thêm. Không mua tùy chọn thì gửi yêu cầu cho Neuraweb: có bảo trì thì nằm trong hạn mức hằng tháng, không có bảo trì thì tính 500.000₫ cho mỗi giờ bắt đầu.",
-      en: "Included in Cao Cấp and Doanh Nghiệp. On Khởi Đầu and Phát Triển it is a paid option. Without it, you send the change to Neuraweb: covered by your monthly quota if you have the care plan, otherwise 500,000₫ per hour started.",
-      fr: "Inclus dans Cao Cấp et Doanh Nghiệp. Sur Khởi Đầu et Phát Triển, c'est une option payante. Sans elle, vous envoyez la demande à Neuraweb : comprise dans le quota mensuel si vous avez l'entretien, sinon 500.000₫ par heure entamée.",
+      vi: "Có sẵn trong Cao Cấp và Doanh Nghiệp. Với Khởi Đầu và Phát Triển, đó là tùy chọn trả thêm. Không mua tùy chọn thì gửi yêu cầu cho Neuraweb: có bảo trì thì nằm trong hạn mức hằng tháng, không có bảo trì thì tính theo giờ (giá xem ở trang /packs).",
+      en: "Included in Cao Cấp and Doanh Nghiệp. On Khởi Đầu and Phát Triển it is a paid option. Without it, you send the change to Neuraweb: covered by your monthly quota if you have the care plan, otherwise billed by the hour (price on the /en/packs page).",
+      fr: "Inclus dans Cao Cấp et Doanh Nghiệp. Sur Khởi Đầu et Phát Triển, c'est une option payante. Sans elle, vous envoyez la demande à Neuraweb : comprise dans le quota mensuel si vous avez l'entretien, sinon facturée à l'heure (prix sur la page /fr/packs).",
     },
     keywords: ["tu sua", "self service", "espace de gestion", "admin", "back office", "editer", "modifier"],
   },

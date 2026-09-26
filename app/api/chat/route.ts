@@ -38,6 +38,7 @@ import {
   getClientIp,
   getOffTopicStrikes,
   isIpBlocked,
+  amountsNotIn,
   namesForbiddenProvider,
   noteSaturation,
   rateLimit,
@@ -48,7 +49,7 @@ import {
 } from "@/lib/chat/guard";
 import { getCached, setCached } from "@/lib/chat/cache";
 import { isBookingRequest, isContactRequest } from "@/lib/chat/intents";
-import { linksFor } from "@/lib/chat/links";
+import { linksFor, withPricingLink } from "@/lib/chat/links";
 import { logChat, reportSecurityEvent, type ChatIntent } from "@/lib/chat/telemetry";
 
 // Rendu à la demande : la route lit des en-têtes de requête et un état par IP.
@@ -146,6 +147,8 @@ type Strings = {
   abuseRefusal: string;
   offTopicLimited: string;
   contactAnswer: string;
+  /** Le modèle a cité un montant absent des extraits : on renvoie vers la page des tarifs. */
+  priceRedirect: string;
   /** Modèle saturé : le widget bloque l'envoi et affiche ce décompte. */
   saturated: string;
   /** Intention de rendez-vous détectée : le widget ouvre le choix des créneaux. */
@@ -170,6 +173,8 @@ const T: Record<Locale, Strings> = {
       "Có lẽ mình không phải người phù hợp cho chủ đề này. 😊 Khung chat này chỉ dành cho các gói website của Neuraweb — anh/chị dùng nút liên hệ trên trang cho những việc khác nhé.",
     contactAnswer:
       'Anh/chị bấm nút "Nhận báo giá" ở đầu trang hoặc "Nhắn Zalo" ở cuối trang là nhắn được ngay — mình trả lời trong ngày. Trước đó, anh/chị muốn mình tư vấn gói nào phù hợp không ạ?',
+    priceRedirect:
+      "Mình không nêu số tiền trong tin nhắn để tránh nhầm lẫn — giá đầy đủ và luôn cập nhật nằm ở trang Bảng giá: /packs (chưa gồm phí triển khai và tên miền). Với ứng dụng Android, tự động hóa và tích hợp AI, giá từng gói nằm ở trang riêng của từng dịch vụ.",
     saturated:
       "Trợ lý đang nhận quá nhiều câu hỏi cùng lúc. Anh/chị đợi {time} giây rồi gửi lại giúp mình nhé.",
     bookingIntro:
@@ -192,6 +197,8 @@ const T: Record<Locale, Strings> = {
       "I don't think I'm the right contact for this topic. 😊 This chat only covers Neuraweb's website packs — please use the contact button on the page for anything else.",
     contactAnswer:
       'Use the "Get a quote" button at the top of the page, or "Message on Zalo" at the bottom — we reply the same day. Before that, would you like help picking the right pack?',
+    priceRedirect:
+      "I don't quote amounts in chat, to avoid any mix-up — the full, always up-to-date prices are on the pricing page: /en/packs (deployment and domain name not included). For the Android app, automation and AI integration, the price of each tier is on that service's own page.",
     saturated:
       "The assistant is handling too many questions at once. Please try again in {time} seconds.",
     bookingIntro:
@@ -214,6 +221,8 @@ const T: Record<Locale, Strings> = {
       "Je ne suis pas le bon interlocuteur pour ce sujet. 😊 Ce chat ne couvre que les packs de sites Neuraweb — pour le reste, utilisez le bouton de contact de la page.",
     contactAnswer:
       "Le bouton « Nhận báo giá » en haut de page, ou « Nhắn Zalo » en bas, permet de nous écrire directement — réponse dans la journée. Avant ça, je vous aide à choisir le pack ?",
+    priceRedirect:
+      "Je ne cite pas de montants dans la discussion, pour éviter toute confusion — les prix complets et à jour sont sur la page des tarifs : /fr/packs (frais de déploiement et nom de domaine non inclus). Pour l'application Android, l'automatisation et l'intégration d'IA, le prix de chaque formule est sur la page propre à chaque prestation.",
     saturated:
       "L'assistant reçoit trop de questions en même temps. Réessayez dans {time} secondes.",
     bookingIntro:
@@ -514,6 +523,15 @@ export async function POST(request: NextRequest) {
       answer = chunks[0].body;
       intent = "faq";
     }
+    // 🛡️ Montants : le chatbot renvoie vers la page des tarifs au lieu de citer un prix.
+    // Tout montant qui ne figure pas dans les extraits de CE tour vient du modèle (sa
+    // mémoire, son imagination) : la réponse est remplacée par le renvoi.
+    const invented = amountsNotIn(answer, chunks.map((c) => `${c.title}\n${c.body}`).join("\n"));
+    if (invented.length) {
+      console.warn(`[chat] réponse remplacée : montant(s) absent(s) des extraits (${invented.join(", ")})`);
+      answer = t.priceRedirect;
+      intent = "faq";
+    }
     // Le cache ne retient que les premiers tours : au-delà, la réponse dépend
     // de ce qui précède et ne se réutilise pas. Un hors-sujet n'est pas gardé.
     if (firstTurn && !OFF_TOPIC_MARKER.test(raw)) setCached(message, locale, answer, sources);
@@ -521,7 +539,7 @@ export async function POST(request: NextRequest) {
     // Les liens sont construits ici, pas écrits par le modèle : voir
     // `lib/chat/links.ts`. C'est ce qui rend le comportement identique dans
     // les trois langues.
-    return reply(answer, intent, { sources, links });
+    return reply(answer, intent, { sources, links: withPricingLink(links, answer, locale) });
   } catch (error) {
     // `AbortSignal.timeout` remonte ici comme une TimeoutError : même traitement.
     console.error("[chat] erreur:", error);

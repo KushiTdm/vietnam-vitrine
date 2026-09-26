@@ -12,7 +12,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { linksFor } from "../lib/chat/links.ts";
+import { linksFor, withPricingLink } from "../lib/chat/links.ts";
 import { corpus } from "../lib/chat/kb/corpus.ts";
 import type { Locale } from "../lib/registry/types.ts";
 
@@ -77,4 +77,20 @@ test("jamais plus de quatre liens, jamais deux fois le même", () => {
 
 test("aucun extrait exploitable : aucun lien inventé", () => {
   assert.deepEqual(linksFor([chunk("faq:domaine", "fr")], "fr"), []);
+});
+
+test("withPricingLink : la réponse qui renvoie vers /packs reçoit le bouton des tarifs, une seule fois", () => {
+  const some = [{ label: "Tích hợp AI", href: "/services/tich-hop-ai" }];
+  const out = withPricingLink(some, "Giá xem ở trang /packs nhé.", "vi");
+  assert.equal(out[0].href, "/packs");
+  assert.equal(out.length, 2);
+  assert.equal(withPricingLink(out, "Giá xem ở trang /packs nhé.", "vi").length, 2, "bouton dupliqué");
+  // Le préfixe de langue compte : « /packs » écrit dans une réponse anglaise n'est pas la page anglaise.
+  assert.equal(withPricingLink(some, "See /en/packs", "en")[0].href, "/en/packs");
+  assert.equal(withPricingLink(some, "See /packs", "en").length, 1);
+  // Rien à ajouter quand la réponse n'en parle pas.
+  assert.equal(withPricingLink(some, "Bonjour", "fr"), some);
+  // Jamais plus de quatre boutons.
+  const four = ["a", "b", "c", "d"].map((x) => ({ label: x, href: `/${x}` }));
+  assert.equal(withPricingLink(four, "voir /fr/packs", "fr").length, 4);
 });

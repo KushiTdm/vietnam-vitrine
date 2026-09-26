@@ -1,8 +1,11 @@
 /**
  * Génère `lib/chat/kb/embeddings.json` — les vecteurs du corpus du chatbot.
  *
- *   cd apps/vitrine && MISTRAL_API_KEY=... tsx scripts/build-embeddings.mts
+ *   cd apps/vitrine && tsx scripts/build-embeddings.mts
  *   (ou, depuis la racine du monorepo : pnpm rag:embeddings)
+ *
+ * La clé `MISTRAL_API_KEY` est lue dans `apps/vitrine/.env.local` puis `.env`
+ * (ou dans l'environnement si elle y est déjà : `MISTRAL_API_KEY=... tsx ...`).
  *
  * À relancer chaque fois que le registre, la FAQ ou les données du jeu
  * changent. Si on oublie, rien ne casse : le fichier porte l'empreinte du
@@ -14,7 +17,7 @@
  * voisins, et le fichier reste lisible dans une revue de code.
  */
 
-import { writeFileSync } from "node:fs";
+import { existsSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { corpus } from "@/lib/chat/kb/corpus";
 import { corpusHash } from "@/lib/chat/embeddings";
@@ -25,6 +28,14 @@ const MODEL = "mistral-embed";
 const OUT = resolve(process.cwd(), "lib/chat/kb/embeddings.json");
 /** L'API accepte des lots ; on reste large sous la limite de jetons par requête. */
 const BATCH = 32;
+
+// `tsx` ne charge aucun fichier .env — seul Next le fait. Sans cette boucle, une clé
+// écrite dans apps/vitrine/.env reste invisible et le script répond « manquante ».
+// Même ordre de priorité que Next : .env.local avant .env, une variable déjà
+// présente dans l'environnement n'est jamais écrasée.
+for (const file of [".env.local", ".env"]) {
+  if (existsSync(file)) process.loadEnvFile(file);
+}
 
 const apiKey = process.env.MISTRAL_API_KEY;
 if (!apiKey) {

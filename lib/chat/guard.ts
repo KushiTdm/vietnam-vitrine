@@ -406,6 +406,45 @@ export function namesForbiddenProvider(text: string): string | null {
 }
 
 // ────────────────────────────────────────────────────────────
+// Montants inventés
+// ────────────────────────────────────────────────────────────
+
+/**
+ * Le chatbot ne cite plus les prix de Neuraweb : il renvoie vers la page (voir
+ * `corpus.ts`, `packPrice`). Une consigne ne suffit pas à un petit modèle — il a déjà
+ * écrit « 19,9 M₫ par mois » pour un prix payé une fois, et inventé « 29.900.000₫ »
+ * pour une option qui n'existe pas — donc la SORTIE est contrôlée, comme pour les
+ * marques d'hébergement.
+ *
+ * Règle : un montant d'argent dans la réponse doit figurer, chiffre pour chiffre, dans
+ * l'un des extraits fournis au modèle pour ce tour. Sinon il vient d'ailleurs — de sa
+ * mémoire ou de son imagination — et la réponse est refusée. Les seuls montants encore
+ * présents dans les extraits sont des estimations de tiers (domaine, infrastructure) et
+ * ceux de l'opération « un site par semaine » : ils passent, tels qu'écrits.
+ *
+ * Un montant = un nombre suivi d'une unité monétaire (₫, đ, VND, USD, $, €, triệu,
+ * nghìn, k, M…), ou précédé de $ / €. « 24/7 », « 15 phút », « 50 % », « 2–3 tuần » n'en
+ * sont pas. Le « đ » est une lettre vietnamienne : il ne compte que s'il n'est pas
+ * suivi d'une autre lettre (« 2 đến » n'est pas un montant).
+ */
+const MONEY_UNIT = "(?:₫|đ|vnd|vnđ|usd|us\\$|\\$|€|eur(?:os?)?|triệu|nghìn|ngàn|tr|k|m|million)";
+const MONEY_RE = new RegExp(
+  `(?:[$€]\\s?\\d[\\d.,]*|\\d[\\d.,]*\\s?${MONEY_UNIT}(?![\\p{L}\\d]))`,
+  "giu",
+);
+
+/** Les chiffres d'un nombre, sans séparateurs : « 19.900.000 » et « 19,900,000 » → « 19900000 ». */
+const digitsOf = (text: string): string => text.replace(/\D/g, "");
+
+/**
+ * Les montants de `answer` absents de `extracts`. Vide = la réponse peut partir.
+ */
+export function amountsNotIn(answer: string, extracts: string): string[] {
+  const known = new Set((extracts.match(/\d[\d.,]*/g) ?? []).map(digitsOf));
+  return (answer.match(MONEY_RE) ?? []).filter((amount) => !known.has(digitsOf(amount)));
+}
+
+// ────────────────────────────────────────────────────────────
 // Nettoyage périodique
 // ────────────────────────────────────────────────────────────
 

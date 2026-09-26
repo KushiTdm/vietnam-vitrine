@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { PROCESS } from "@/lib/registry";
 import { agency } from "../showcase.config";
 import { useLanguage, LocalizedLink as Link } from "./LanguageProvider";
@@ -22,25 +23,34 @@ function XIcon() {
 
 export default function SiteFooter() {
   const { t, tr } = useLanguage();
+  // /services/... en VI, /en/services/..., /fr/services/... : le préfixe de langue
+  // n'a pas d'importance ici, seul le segment compte.
+  const onServicePage = /(^|\/)services\//.test(usePathname());
 
   return (
     <footer className="bg-deep text-on-deep">
-      {/* ---------- Quy trình ---------- */}
-      <section id="quy-trinh" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 md:py-20">
-        <h2 className="font-display text-3xl md:text-4xl">{t("processTitle")}</h2>
-        <p className="mt-2 max-w-xl text-[16px] text-[rgba(243,237,227,0.7)]">
-          {t("processLead")}
-        </p>
+      {/* ---------- Quy trình ----------
+          C'est le déroulé d'un SITE : « 7 jours ». Une page de prestation
+          (application, automatisation, IA) affiche le sien, avec ses propres
+          délais — voir services/[service]/page.tsx. Laisser celui-ci dessous
+          promettrait sept jours pour une application. */}
+      {onServicePage ? null : (
+        <section id="quy-trinh" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 md:py-20">
+          <h2 className="font-display text-3xl md:text-4xl">{t("processTitle")}</h2>
+          <p className="mt-2 max-w-xl text-[16px] text-[rgba(243,237,227,0.7)]">
+            {t("processLead")}
+          </p>
 
-        <ol className="mt-8 grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-          {PROCESS.map((step) => (
-            <li key={step.step} className="border-t border-[rgba(243,237,227,0.2)] pt-4">
-              <span className="font-display text-2xl text-gold">{step.step}</span>
-              <p className="mt-1 text-[16px] leading-snug">{tr(step.label)}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
+          <ol className="mt-8 grid gap-x-6 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
+            {PROCESS.map((step) => (
+              <li key={step.step} className="border-t border-[rgba(243,237,227,0.2)] pt-4">
+                <span className="font-display text-2xl text-gold">{step.step}</span>
+                <p className="mt-1 text-[16px] leading-snug">{tr(step.label)}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       {/* ---------- Contact ---------- */}
       <section className="border-t border-[rgba(243,237,227,0.14)]">

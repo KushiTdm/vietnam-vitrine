@@ -24,6 +24,9 @@ export type ChatLink = { label: string; href: string };
 /** Au-delà, la réponse se transforme en annuaire. */
 const MAX_LINKS = 4;
 
+/** Les sujets d'extraits dont la question de prix trouve sa réponse sur `/packs`. */
+const PRICE_TOPICS = new Set(["pack", "option", "non-inclus", "modifications"]);
+
 function path(p: string, locale: Locale): string {
   if (locale === "vi") return p;
   return p === "/" ? `/${locale}` : `/${locale}${p}`;
@@ -81,8 +84,11 @@ export function linksFor(chunks: Chunk[], locale: Locale): ChatLink[] {
     }
   }
 
-  // ── La grille, quand on a parlé paliers sans rien d'autre à montrer ────
-  if (!links.length && chunks.some((c) => c.topic === "pack")) {
+  // ── Les tarifs, dès qu'on a touché au prix d'un pack ───────────────────
+  // Le chatbot ne cite plus les montants : il renvoie vers cette page. Le chip doit donc
+  // accompagner TOUTE réponse qui en parle — pas seulement quand il n'y a rien d'autre à
+  // montrer, sinon une réponse sur un métier laissait la question du prix sans issue.
+  if (chunks.some((c) => PRICE_TOPICS.has(c.topic))) {
     push(
       { vi: "Bảng giá", en: "Pricing", fr: "Tarifs" }[locale],
       path("/packs", locale),
@@ -90,4 +96,20 @@ export function linksFor(chunks: Chunk[], locale: Locale): ChatLink[] {
   }
 
   return links;
+}
+
+/**
+ * Le texte de la réponse renvoie vers la page des tarifs : le bouton doit l'accompagner.
+ *
+ * Le chatbot ne cite plus les montants, il écrit « voir /packs ». Un chemin écrit en
+ * clair ne se clique pas, et les extraits retrouvés ne portent pas toujours sur un pack
+ * (« Giá các gói thế nào ? » retrouvait les prestations) : sans ceci, la réponse
+ * annonçait une page sans offrir le moyen d'y aller. Placé en tête, puisque c'est de lui
+ * que parle la réponse.
+ */
+export function withPricingLink(links: ChatLink[], answer: string, locale: Locale): ChatLink[] {
+  const href = path("/packs", locale);
+  if (!answer.includes(href) || links.some((link) => link.href === href)) return links;
+  const label = { vi: "Bảng giá", en: "Pricing", fr: "Tarifs" }[locale];
+  return [{ label, href }, ...links].slice(0, MAX_LINKS);
 }

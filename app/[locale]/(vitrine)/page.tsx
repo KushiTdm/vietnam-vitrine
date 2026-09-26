@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { PACKS, PLANNED_VERTICALS, SERVICES, VERTICALS, approxUsd, formatVnd } from "@/lib/registry";
 import { useLanguage, LocalizedLink as Link } from "./components/LanguageProvider";
 import PackCard from "./components/PackCard";
@@ -141,27 +142,34 @@ export default function Home() {
               <Link
                 key={service.id}
                 href={`/services/${service.slug}`}
-                className="group flex flex-col rounded-2xl border border-line bg-ground p-6 transition-colors hover:border-ink"
+                className="group flex flex-col overflow-hidden rounded-2xl border border-line bg-ground transition-colors hover:border-ink"
                 data-reveal
                 style={{ ["--d" as string]: `${i * 60}ms` }}
               >
-                <span
-                  aria-hidden="true"
-                  className="flex h-12 w-12 items-center justify-center rounded-xl text-[22px]"
-                  style={{ background: `${service.accent}1a` }}
-                >
-                  {service.icon}
-                </span>
-                <h3 className="mt-4 font-display text-[22px] leading-tight">{tr(service.name)}</h3>
-                <p className="mt-1 text-[15px] leading-snug text-muted">{tr(service.tagline)}</p>
-                <p className="mt-4 text-[15px]">
-                  <span className="text-muted">{t("from")} </span>
-                  <span className="font-medium">{formatVnd(service.floor)}</span>
-                  <span className="text-muted"> {approxUsd(service.floor)}</span>
-                </p>
-                <span className="mt-4 text-[14px] font-medium text-ink underline underline-offset-4 group-hover:opacity-70">
-                  {t("seeService")}
-                </span>
+                {/* Une nature morte, jamais une personne : la carte doit rester
+                    lisible comme « un objet de ce métier-là » et ne prétend
+                    montrer aucun client. Le titre est juste dessous, d'où l'alt vide. */}
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-[rgba(22,20,15,0.04)]">
+                  <Image
+                    src={`/vitrine/${service.card}.webp`}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col p-6">
+                  <h3 className="font-display text-[22px] leading-tight">{tr(service.name)}</h3>
+                  <p className="mt-1 text-[15px] leading-snug text-muted">{tr(service.tagline)}</p>
+                  <p className="mt-4 text-[15px]">
+                    <span className="text-muted">{t("from")} </span>
+                    <span className="font-medium">{formatVnd(service.floor)}</span>
+                    <span className="text-muted"> {approxUsd(service.floor)}</span>
+                  </p>
+                  <span className="mt-4 text-[14px] font-medium text-ink underline underline-offset-4 group-hover:opacity-70">
+                    {t("seeService")}
+                  </span>
+                </div>
               </Link>
             ))}
           </div>

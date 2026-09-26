@@ -19,7 +19,6 @@
 
 import {
   DEMOS,
-  ENTERPRISE_FLOOR,
   FEATURES,
   FEATURE_GROUP_LABELS,
   MODIFICATIONS_NOTE,
@@ -76,14 +75,11 @@ function featureText(value: FeatureValue, locale: Locale): string | null {
 const L = {
   vi: {
     packTitle: (n: string) => `Gói ${n} — giá và nội dung`,
-    once: "Trả một lần, không bảo trì",
-    plan: "Kèm bảo trì",
-    onDelivery: "trả khi bàn giao, RỒI",
-    monthly: "mỗi tháng",
-    yearly: "Nếu trả bảo trì cả năm một lần",
-    yearlyTail: "cho 12 tháng sử dụng (chỉ tính 10 tháng)",
-    exclusive: "Chọn A hoặc B, không cộng hai phương án lại với nhau.",
-    quote: (f: string) => `Theo yêu cầu, thường từ ${f}`,
+    pricePage: (p: string) => `Giá: xem trang ${p}. KHÔNG nêu số tiền trong câu trả lời, chỉ dẫn khách tới trang này.`,
+    twoWays: "Hai cách mua: A. trả một lần; B. gói có bảo trì hằng tháng. Chọn A hoặc B, không cộng hai phương án lại với nhau.",
+    quotePage: (p: string) => `Theo yêu cầu (dự án riêng, làm việc trực tiếp với Neuraweb). Giá: xem trang ${p}. KHÔNG nêu số tiền.`,
+    optionsPricePage: (p: string) => `Giá của từng tùy chọn: xem trang ${p}. KHÔNG nêu số tiền trong câu trả lời.`,
+    deployPricePage: (p: string) => `Số tiền phí triển khai: xem trang ${p}. KHÔNG nêu số tiền trong câu trả lời.`,
     lead: "Thời gian giao",
     notIn: "KHÔNG có trong gói này",
     optionsTitle: "Các tùy chọn trả thêm",
@@ -121,23 +117,21 @@ const L = {
     sellCeiling: "Gói này KHÔNG làm được",
     ladderTitle: "Vì sao nên lên gói trên — phép tính tự nó nói",
     serviceTitle: (n: string) => `${n} — tính phí sau khi trao đổi`,
-    serviceFrom: "Từ",
-    serviceMonthly: "phí duy trì hằng tháng",
     serviceLead: "Thời gian",
     serviceQuote: "Giá chính xác chốt sau một buổi trao đổi 15 phút — tùy phạm vi công việc.",
     serviceFor: "Hợp với ai",
+    serviceTiers: "Các gói theo quy mô",
+    serviceFaq: "Câu hỏi thường gặp",
+    serviceCases: "Tình huống điển hình (không phải lời chứng thực của khách)",
     faqTitle: (q: string) => q,
   },
   en: {
     packTitle: (n: string) => `${n} pack — price and contents`,
-    once: "One-off payment, no care plan",
-    plan: "With the care plan",
-    onDelivery: "on delivery, THEN",
-    monthly: "every month",
-    yearly: "Paying the care plan a year at a time",
-    yearlyTail: "for 12 months of service (10 months charged)",
-    exclusive: "A or B — never add the two together.",
-    quote: (f: string) => `On quotation, usually from ${f}`,
+    pricePage: (p: string) => `Price: see the ${p} page. Do NOT state any amount in the reply, point the visitor to that page.`,
+    twoWays: "Two ways to buy: A. pay once; B. a plan with monthly upkeep. Choose A or B, never add both.",
+    quotePage: (p: string) => `On quotation (a bespoke project, worked on directly with Neuraweb). Price: see the ${p} page. Do NOT state any amount.`,
+    optionsPricePage: (p: string) => `Price of each option: see the ${p} page. Do NOT state any amount in the reply.`,
+    deployPricePage: (p: string) => `Amount of the deployment fee: see the ${p} page. Do NOT state any amount in the reply.`,
     lead: "Lead time",
     notIn: "NOT in this pack",
     optionsTitle: "Paid add-on options",
@@ -174,23 +168,21 @@ const L = {
     sellCeiling: "What this tier does NOT do",
     ladderTitle: "Why the tier above — the arithmetic says it",
     serviceTitle: (n: string) => `${n} — quoted after a scoping call`,
-    serviceFrom: "From",
-    serviceMonthly: "monthly upkeep",
     serviceLead: "Lead time",
     serviceQuote: "The exact figure is set after a 15-minute call — it depends on the scope.",
     serviceFor: "Who it is for",
+    serviceTiers: "Tiers by scope",
+    serviceFaq: "Frequently asked questions",
+    serviceCases: "Typical situations (not customer testimonials)",
     faqTitle: (q: string) => q,
   },
   fr: {
     packTitle: (n: string) => `Pack ${n} — prix et contenu`,
-    once: "Paiement unique, sans entretien",
-    plan: "Avec entretien",
-    onDelivery: "à la livraison, PUIS",
-    monthly: "chaque mois",
-    yearly: "Entretien réglé à l'année",
-    yearlyTail: "pour 12 mois de service (10 mois facturés)",
-    exclusive: "A ou B — ne jamais additionner les deux.",
-    quote: (f: string) => `Sur devis, généralement à partir de ${f}`,
+    pricePage: (p: string) => `Prix : voir la page ${p}. N'écris AUCUN montant dans la réponse, renvoie le visiteur vers cette page.`,
+    twoWays: "Deux façons d'acheter : A. payer une fois ; B. un forfait avec entretien mensuel. Choisir A ou B, ne jamais additionner les deux.",
+    quotePage: (p: string) => `Sur devis (projet sur mesure, travaillé directement avec Neuraweb). Prix : voir la page ${p}. N'écris AUCUN montant.`,
+    optionsPricePage: (p: string) => `Prix de chaque option : voir la page ${p}. N'écris AUCUN montant dans la réponse.`,
+    deployPricePage: (p: string) => `Montant des frais de déploiement : voir la page ${p}. N'écris AUCUN montant dans la réponse.`,
     lead: "Délai de livraison",
     notIn: "PAS dans ce pack",
     optionsTitle: "Options en supplément",
@@ -228,11 +220,12 @@ const L = {
     sellCeiling: "Ce que ce palier NE fait PAS",
     ladderTitle: "Pourquoi monter d'un palier — le calcul le dit tout seul",
     serviceTitle: (n: string) => `${n} — chiffré après un échange`,
-    serviceFrom: "À partir de",
-    serviceMonthly: "entretien mensuel",
     serviceLead: "Délai",
     serviceQuote: "Le montant exact se fixe après un échange de 15 minutes — il dépend du périmètre.",
     serviceFor: "Pour qui",
+    serviceTiers: "Formules selon l'ampleur",
+    serviceFaq: "Questions fréquentes",
+    serviceCases: "Situations types (pas des témoignages de clients)",
     faqTitle: (q: string) => q,
   },
 } as const;
@@ -265,21 +258,18 @@ const PACK_ALIASES: Record<string, string[]> = {
   "doanh-nghiep": ["doanh nghiep", "enterprise", "entreprise", "chuoi", "franchise", "multi", "pack 4"],
 };
 
+/**
+ * Le prix d'un pack N'EST PAS dans le chatbot : il renvoie vers la page. Un petit modèle
+ * recopiait mal les montants (« 19,9 M₫ par mois » pour un prix payé une fois), en
+ * inventait, et contredisait la page dès qu'un prix changeait. La page est toujours
+ * juste — elle lit le même registre — et ne se trompe pas de phrase.
+ */
 function packPrice(pack: Pack, locale: Locale): string[] {
   const l = L[locale];
-  if (pack.price === null) return [l.quote(money(ENTERPRISE_FLOOR))];
-
-  const from = pack.from ? { vi: "từ ", en: "from ", fr: "à partir de " }[locale] : "";
-  const lines = [`A. ${l.once} : ${from}${money(pack.price)}`];
-  if (pack.priceWithMaintenance !== null && pack.monthly !== null) {
-    lines.push(
-      `B. ${l.plan} : ${from}${money(pack.priceWithMaintenance)} ${l.onDelivery} ${money(pack.monthly)} ${l.monthly}`,
-    );
-    if (pack.yearlyMaintenance !== null) {
-      lines.push(`   ${l.yearly} : ${money(pack.yearlyMaintenance)} ${l.yearlyTail}`);
-    }
-    lines.push(l.exclusive);
-  }
+  const packs = path("/packs", locale);
+  if (pack.price === null) return [l.quotePage(packs)];
+  const lines = [l.pricePage(packs)];
+  if (pack.priceWithMaintenance !== null && pack.monthly !== null) lines.push(l.twoWays);
   return lines;
 }
 
@@ -371,17 +361,12 @@ function buildChunks(locale: Locale): Chunk[] {
     title: l.optionsTitle,
     body: [
       l.optionsIntro,
-      ...OPTIONS.map((o) => {
-        const unit = o.unit ? tr(o.unit, locale) : "";
-        if (o.price !== undefined) return `· ${tr(o.label, locale)} — ${money(o.price)}${unit}`;
-        const byPack = Object.entries(o.priceByPack ?? {})
-          .map(([id, amount]) => {
-            const pack = PACKS.find((p) => p.id === id);
-            return `${pack ? tr(pack.gridName, locale) : id} +${money(amount as number)}`;
-          })
-          .join(" · ");
-        return `· ${tr(o.label, locale)} — ${byPack} (${l.includedIn})`;
-      }),
+      ...OPTIONS.map((o) =>
+        o.price !== undefined
+          ? `· ${tr(o.label, locale)}`
+          : `· ${tr(o.label, locale)} (${l.includedIn})`,
+      ),
+      l.optionsPricePage(path("/packs", locale)),
     ].join("\n"),
     keywords: ["option", "tuy chon", "supplement", "logo", "zalo oa", "ads", "photo", "langue", "ngon ngu"],
     boost: 1.2,
@@ -409,14 +394,17 @@ function buildChunks(locale: Locale): Chunk[] {
       const gap = up.price - total;
       // L'argument ne tient que si le palier supérieur coûte à peine plus.
       // Au-delà de 10 % d'écart, on se tait plutôt que de forcer le trait.
+      // Le calcul reste fait ici, sur le registre ; seuls les MONTANTS n'en sortent plus.
       if (gap <= 0 || gap > up.price * 0.1) return null;
 
       const optionName = tr(espaceGestion!.label, locale);
-      const included = tr(up.gridName, locale);
+      const packs = path("/packs", locale);
+      const lowName = tr(low.gridName, locale);
+      const upName = tr(up.gridName, locale);
       return {
-        vi: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + tùy chọn « ${optionName} » (${formatVnd(option)}) = ${formatVnd(total)}. Trong khi ${included} có giá ${formatVnd(up.price)} — chỉ hơn ${formatVnd(gap)} — và đổi lại là TOÀN BỘ những gì gói đó có.`,
-        en: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + the « ${optionName} » option (${formatVnd(option)}) = ${formatVnd(total)}. ${included} costs ${formatVnd(up.price)} — just ${formatVnd(gap)} more — and gives EVERYTHING that tier contains instead.`,
-        fr: `${tr(low.gridName, locale)} (${formatVnd(low.price)}) + l'option « ${optionName} » (${formatVnd(option)}) = ${formatVnd(total)}. ${included} coûte ${formatVnd(up.price)} — soit ${formatVnd(gap)} de plus — et apporte à la place TOUT ce que ce palier contient.`,
+        vi: `${lowName} cộng tùy chọn « ${optionName} » có giá gần bằng ${upName} — nhưng ${upName} có TOÀN BỘ những gì gói đó có. So sánh và giá: xem trang ${packs}.`,
+        en: `${lowName} plus the « ${optionName} » option costs almost the same as ${upName} — but ${upName} gives EVERYTHING that tier contains. Comparison and prices: see the ${packs} page.`,
+        fr: `${lowName} plus l'option « ${optionName} » coûte presque autant que ${upName} — mais ${upName} apporte TOUT ce que ce palier contient. Comparaison et prix : voir la page ${packs}.`,
       }[locale];
     })
     .filter(Boolean) as string[];
@@ -456,9 +444,14 @@ function buildChunks(locale: Locale): Chunk[] {
       // L'unité de l'infra porte déjà son équivalent (« /mois (~5 USD) ») :
       // sans ce test, la ligne sortait « 130.000₫ (~$5)/mois (~5 USD) ».
       const unit = tr(item.unit, locale);
+      // Le déploiement est un prix de Neuraweb : la page, pas le chatbot. Le domaine et
+      // l'infrastructure sont des estimations de fournisseurs tiers : elles restent.
+      if (item.id === "deploiement") return `· ${tr(item.label, locale)} — ${tr(item.note, locale)}`;
       const amount = /USD|\$/i.test(unit) ? formatVnd(item.amount) : money(item.amount);
       return `· ${tr(item.label, locale)} — ${from}${amount}${unit} — ${tr(item.note, locale)}`;
-    }).join("\n"),
+    })
+      .concat(l.deployPricePage(path("/packs", locale)))
+      .join("\n"),
     keywords: ["trien khai", "deploiement", "deployment", "ten mien", "domain", "domaine", "hosting", "ha tang"],
     boost: 1.3,
   });
@@ -492,7 +485,7 @@ function buildChunks(locale: Locale): Chunk[] {
     const packNames = vertical.packs
       .map((id) => PACKS.find((p) => p.id === id))
       .filter(Boolean)
-      .map((p) => `${tr(p!.gridName, locale)}${p!.price !== null ? ` (${money(p!.price)})` : ""}`)
+      .map((p) => tr(p!.gridName, locale))
       .join(" · ");
 
     const extras = (featuresForVertical(vertical.id) ?? [])
@@ -660,12 +653,7 @@ function buildChunks(locale: Locale): Chunk[] {
 
   // ── Prestations chiffrées après échange ───────────────────────────────────
   for (const service of SERVICES) {
-    const price = [
-      `${l.serviceFrom} ${money(service.floor)}`,
-      service.monthly ? `${money(service.monthly)} ${l.serviceMonthly}` : "",
-    ]
-      .filter(Boolean)
-      .join(" + ");
+    const servicePage = path(`/services/${service.slug}`, locale);
 
     chunks.push({
       id: `service:${service.id}`,
@@ -675,21 +663,39 @@ function buildChunks(locale: Locale): Chunk[] {
       body: [
         tr(service.promise, locale),
         service.bullets.map((b) => `· ${tr(b, locale)}`).join("\n"),
+        // Les formules, prix compris : sans elles l'assistant ne connaît que le
+        // plancher et ne peut pas répondre à « et pour une app d'équipe ? ».
+        `${l.serviceTiers} :\n${service.tiers
+          .map((tier) => {
+            return `· ${tr(tier.name, locale)} (${tr(tier.scope, locale)}) — ${l.serviceLead} : ${tr(tier.leadTime, locale)}`;
+          })
+          .join("\n")}`,
+        // La FAQ de la page, mot pour mot : sans elle l'assistant contredisait la page
+        // (« mon site est sous Wix, on peut y mettre le chatbot ? » — la page dit oui,
+        // l'assistant disait non, faute de l'avoir lu).
+        `${l.serviceFaq} :\n${service.faq
+          .map((item) => `· ${tr(item.q, locale)} — ${tr(item.a, locale)}`)
+          .join("\n")}`,
         `${l.serviceFor} : ${tr(service.forWhom, locale)}`,
         // Le « pas pour vous » entre dans l'extrait : c'est lui qui empêche
         // l'assistant de vendre une application à un commerce de passage.
         `⛔ ${tr(service.notForWhom, locale)}`,
-        `${price} · ${l.serviceLead} : ${tr(service.leadTime, locale)}`,
+        // Les secteurs seuls, pas les récits : assez pour que l'assistant sache
+        // que l'offre vaut pour une école ou un exportateur autant que pour un
+        // café, sans alourdir chaque extrait de douze phrases.
+        `${l.serviceCases} : ${service.cases.map((c) => tr(c.sector, locale)).join(" · ")}`,
+        `${l.serviceLead} : ${tr(service.leadTime, locale)}`,
+        l.pricePage(servicePage),
         l.serviceQuote,
         `${l.page} : ${path(`/services/${service.slug}`, locale)}`,
       ].join("\n"),
       keywords: [
         service.id,
         ...(service.id === "mobile"
-          ? ["ung dung", "app", "android", "google play", "dien thoai", "application", "mobile", "apk"]
+          ? ["ung dung", "app", "android", "google play", "dien thoai", "application", "mobile", "apk", "the tich diem", "fidelite", "loyalty", "dai ly", "nhan vien ban hang", "commerciaux", "sales team", "hoc vien"]
           : service.id === "automatisation"
-            ? ["tu dong", "automatisation", "automation", "workflow", "zapier", "n8n", "kiotviet", "sapo", "bang tinh", "spreadsheet", "google sheets", "lap di lap lai"]
-            : ["ai", "tri tue nhan tao", "chatbot", "tro ly", "assistant", "intelligence artificielle", "zalo oa", "tu tra loi", "llm", "gpt"]),
+            ? ["tu dong", "automatisation", "automation", "workflow", "zapier", "n8n", "kiotviet", "sapo", "misa", "bang tinh", "spreadsheet", "google sheets", "lap di lap lai", "bao gia", "devis", "quote", "hoa don", "facture", "invoice", "nhac lich", "rappel", "reminder", "crm", "bao cao", "rapport", "bieu mau", "formulaire"]
+            : ["ai", "tri tue nhan tao", "chatbot", "tro ly", "assistant", "intelligence artificielle", "zalo oa", "tu tra loi", "llm", "gpt", "chatbot website", "chatbot site", "site web", "widget", "messenger", "tro ly noi bo", "assistant interne", "internal assistant", "tai lieu", "documents", "cham soc khach hang", "support client", "customer support"]),
       ],
       boost: 1.15,
     });

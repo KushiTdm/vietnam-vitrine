@@ -14,6 +14,7 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { existsSync } from "node:fs";
 
 // Imports relatifs et fichiers désignés un par un, jamais le baril
 // `lib/registry/index.ts` : sous le lanceur de tests (.mts = ESM strict), un
@@ -24,7 +25,7 @@ import { corpus } from "../lib/chat/kb/corpus.ts";
 import { FAQ } from "../lib/chat/kb/faq.ts";
 import { search, withPackCoherence } from "../lib/chat/retrieval.ts";
 import { buildSystemPrompt } from "../lib/chat/context.ts";
-import { SERVICES } from "../lib/registry/services.ts";
+import { ABOUT, SERVICES } from "../lib/registry/services.ts";
 import { ENTERPRISE_FLOOR, PACKS } from "../lib/registry/packs.ts";
 import { formatVnd } from "../lib/registry/format.ts";
 import type { Locale } from "../lib/registry/types.ts";
@@ -52,16 +53,18 @@ test("corpus : aucun extrait vide, aucun identifiant en double", () => {
   }
 });
 
-test("corpus : chaque pack est présent avec son prix exact", () => {
+test("corpus : chaque pack est présent, SANS son prix, avec un renvoi vers la page des tarifs", () => {
+  // Décision du 26 sept. 2026 : le chatbot ne cite plus les prix, il renvoie vers la page.
+  // Un petit modèle recopiait mal les montants et en inventait ; la page, elle, lit le
+  // registre et ne se trompe pas.
   for (const locale of LOCALES) {
+    const packsPage = locale === "vi" ? "/packs" : `/${locale}/packs`;
     for (const pack of PACKS) {
       const chunk = corpus(locale).find((c) => c.id === `pack:${pack.id}`);
       assert.ok(chunk, `pack absent : ${pack.id} (${locale})`);
+      assert.ok(chunk!.body.includes(packsPage), `renvoi vers ${packsPage} absent de ${chunk!.id} (${locale})`);
       if (pack.price !== null) {
-        assert.ok(
-          chunk!.body.includes(formatVnd(pack.price)),
-          `prix absent de ${chunk!.id} (${locale})`,
-        );
+        assert.ok(!chunk!.body.includes(formatVnd(pack.price)), `prix encore présent dans ${chunk!.id} (${locale})`);
       }
     }
   }
@@ -204,11 +207,14 @@ test("recherche : une question sans rapport ne ramène rien de significatif", ()
 // Assemblage du prompt
 // ────────────────────────────────────────────────────────────
 
-test("prompt : la grille de prix est présente même sans aucun extrait", () => {
+test("prompt : la liste des packs est présente même sans extrait, SANS montant, avec le renvoi vers la page", () => {
   for (const locale of LOCALES) {
     const prompt = buildSystemPrompt(locale, []);
+    const packsPage = locale === "vi" ? "/packs" : `/${locale}/packs`;
+    assert.ok(prompt.includes(packsPage), `renvoi vers ${packsPage} absent du prompt (${locale})`);
     for (const pack of PACKS) {
-      if (pack.price !== null) assert.ok(prompt.includes(formatVnd(pack.price)), `prix manquant (${locale})`);
+      assert.ok(prompt.includes(pack.gridName[locale]), `pack absent de la liste (${locale}) : ${pack.id}`);
+      if (pack.price !== null) assert.ok(!prompt.includes(formatVnd(pack.price)), `prix dans le prompt (${locale}) : ${pack.id}`);
     }
   }
 });
@@ -283,4 +289,151 @@ test("prestations : aucun plancher ne descend sous le repère du marché local",
   assert.ok(floor("mobile") >= 35_000_000, "app mobile sous le premier prix du marché");
   assert.ok(floor("ia") >= 15_000_000, "IA au niveau d'un abonnement SaaS générique");
   assert.ok(floor("automatisation") >= 8 * 900_000, "automatisation sous huit heures de travail");
+});
+
+// ────────────────────────────────────────────────────────────
+// Formules, cas concrets et calendrier propre à chaque prestation
+// ────────────────────────────────────────────────────────────
+
+test("prestations : formules du plus simple au plus large, plancher dérivé de la première", () => {
+  for (const service of SERVICES) {
+    assert.ok(service.tiers.length >= 3, `${service.id} : moins de trois formules`);
+    assert.equal(service.floor, service.tiers[0].floor, `${service.id} : plancher recopié, pas dérivé`);
+    assert.equal(service.monthly, service.tiers[0].monthly, `${service.id} : entretien recopié, pas dérivé`);
+    for (let i = 1; i < service.tiers.length; i++) {
+      assert.ok(
+        service.tiers[i].floor > service.tiers[i - 1].floor,
+        `${service.id} : la formule « ${service.tiers[i].id} » n'est pas plus chère que la précédente`,
+      );
+    }
+  }
+});
+
+test("prestations : chacune montre des cas variés et un calendrier en quatre étapes", () => {
+  for (const service of SERVICES) {
+    assert.ok(service.cases.length >= 4, `${service.id} : moins de quatre cas concrets`);
+    assert.equal(service.process.length, 4, `${service.id} : le calendrier n'a pas quatre étapes`);
+    // Des secteurs distincts : quatre variantes du même café ne « touchent pas tout le monde ».
+    const sectors = new Set(service.cases.map((c) => c.sector.fr));
+    assert.equal(sectors.size, service.cases.length, `${service.id} : deux cas dans le même secteur`);
+  }
+});
+
+test("prestations : le « 7 jours » des sites n'apparaît sous aucune prestation", () => {
+  // Le pied de page des sites promet sept jours ; une application ou une
+  // automatisation ne se livre pas en sept jours. Le calendrier de chaque
+  // prestation, ses délais et ceux de ses formules ne doivent pas le recopier.
+  const sevenDays = /\b7\s*(ngày|days|jours)\b|\bsept jours\b|\bseven days\b/i;
+  for (const service of SERVICES) {
+    const texts = [
+      ...LOCALES.map((l) => service.leadTime[l]),
+      ...service.tiers.flatMap((t) => LOCALES.map((l) => t.leadTime[l])),
+      ...service.process.flatMap((s) => LOCALES.flatMap((l) => [s.title[l], s.when[l], s.detail[l]])),
+    ];
+    for (const text of texts) assert.ok(!sevenDays.test(text), `${service.id} promet 7 jours : « ${text} »`);
+  }
+});
+
+test("prestations : les formules restent sous le premier prix des agences de Hanoi", () => {
+  // Relevé de septembre 2026 (README) : chatbot sur mesure dès 125 M₫, app dont
+  // l'agence remet le code dès 150 M₫, déploiement d'automatisation complexe
+  // jusqu'à 50 M₫. C'est l'argument de vente : on ne le perd pas en douce en
+  // relevant une formule au-dessus de ce que facture une agence.
+  const top = (id: string) => Math.max(...SERVICES.find((s) => s.id === id)!.tiers.map((t) => t.floor));
+  assert.ok(top("ia") < 125_000_000, "IA : une formule dépasse le premier prix d'un chatbot sur mesure");
+  assert.ok(top("mobile") < 150_000_000, "app : une formule atteint le prix où les agences remettent le code");
+  assert.ok(top("automatisation") <= 50_000_000, "automatisation : une formule dépasse un déploiement complexe");
+});
+
+test("corpus : chaque prestation porte ses formules, SANS leurs prix, avec un renvoi vers sa page", () => {
+  for (const locale of LOCALES) {
+    for (const service of SERVICES) {
+      const body = corpus(locale).find((c) => c.id === `service:${service.id}`)!.body;
+      const page = locale === "vi" ? `/services/${service.slug}` : `/${locale}/services/${service.slug}`;
+      assert.ok(body.includes(page), `renvoi vers ${page} absent (${locale})`);
+      for (const tier of service.tiers) {
+        assert.ok(body.includes(tier.name[locale]), `${service.id}/${tier.id} absente en ${locale}`);
+        assert.ok(!body.includes(formatVnd(tier.floor)), `prix de ${service.id}/${tier.id} encore présent en ${locale}`);
+        if (tier.monthly) assert.ok(!body.includes(formatVnd(tier.monthly)), `mensualité de ${service.id}/${tier.id} encore présente en ${locale}`);
+      }
+    }
+  }
+});
+
+test("prompt : les prestations ne sont plus réservées à qui a acheté un site chez nous", () => {
+  // La règle d'origine disait « vendues APRÈS un site, jamais à la place » : elle
+  // empêchait de proposer un chatbot à une clinique ou un exportateur qui a déjà
+  // son site. Elle a été remplacée ; ce test empêche son retour.
+  for (const locale of LOCALES) {
+    const prompt = buildSystemPrompt(locale, []);
+    assert.ok(!/APRÈS un site|AFTER a site|bán SAU website/.test(prompt), `ancienne règle « après un site » en ${locale}`);
+  }
+});
+
+test("prestations : chaque visuel référencé existe dans public/vitrine, avec un alt dans les trois langues", () => {
+  // Une image renommée ou oubliée ne casse rien à la compilation : la page
+  // affiche un carré vide. Ce test le rattrape avant la mise en ligne.
+  const exists = (file: string) => existsSync(new URL(`../public/vitrine/${file}`, import.meta.url));
+  assert.ok(exists(`${ABOUT.image}.webp`), `${ABOUT.image}.webp absent de public/vitrine/`);
+  for (const locale of LOCALES) assert.ok(ABOUT.alt[locale].trim() && ABOUT.text[locale].trim(), `bloc « qui travaille avec vous » incomplet en ${locale}`);
+  for (const service of SERVICES) {
+    const files = [
+      `${service.card}.webp`,
+      `${service.hero.image}.webp`,
+      ...(service.hero.video ? [`${service.hero.image}.mp4`, `${service.hero.image}.webm`] : []),
+      `${service.banner.image}.webp`,
+      ...service.cases.map((c) => `${c.image}.webp`),
+      ...service.process.flatMap((step) => (step.image ? [`${step.image}.webp`] : [])),
+      ...(service.proof?.items.map((item) => `${item.image}.webp`) ?? []),
+    ];
+    for (const file of files) assert.ok(exists(file), `${service.id} : ${file} absent de public/vitrine/`);
+    for (const visual of [service.hero, service.banner, ...(service.proof?.items ?? [])]) {
+      for (const locale of LOCALES) {
+        assert.ok(visual.alt[locale]?.trim(), `${service.id} : alt vide en ${locale} (${visual.image})`);
+      }
+    }
+  }
+});
+
+test("corpus : la FAQ de chaque prestation est lue par l'assistant, mot pour mot", () => {
+  // Régression : la page affichait « on peut mettre le chatbot sur un site qui n'est pas
+  // de Neuraweb » quand l'assistant, qui n'avait pas lu cette FAQ, répondait le contraire.
+  // La page et le chatbot doivent dire la même chose : une seule source, deux lecteurs.
+  for (const locale of LOCALES) {
+    for (const service of SERVICES) {
+      const body = corpus(locale).find((c) => c.id === `service:${service.id}`)!.body;
+      for (const item of service.faq) {
+        assert.ok(body.includes(item.a[locale]), `FAQ « ${item.q[locale]} » absente de ${service.id} en ${locale}`);
+      }
+    }
+  }
+});
+
+test("corpus : aucun prix de pack, d'option ou de prestation nulle part dans ce que lit le chatbot", () => {
+  // Le garde-fou ne vaut que si les extraits ne portent plus de prix de Neuraweb : un montant
+  // présent dans un extrait serait « autorisé » dans la réponse. Sont exclus, parce qu'ils
+  // portent légitimement des montants : l'opération « un site par semaine » (frais de 50 USD)
+  // et les estimations de tiers (nom de domaine, infrastructure).
+  const NEURAWEB_PRICES = [
+    ...PACKS.flatMap((p) => [p.price, p.priceWithMaintenance, p.monthly, p.yearlyMaintenance]),
+    ENTERPRISE_FLOOR,
+    ...SERVICES.flatMap((s) => s.tiers.flatMap((t) => [t.floor, t.monthly])),
+  ].filter((n): n is number => typeof n === "number" && n > 0);
+  const exempt = (id: string) => id.startsWith("gift") || id.startsWith("jeu") || id === "non-inclus" || id.startsWith("faq:") || id === "tech" || id.startsWith("tech:");
+  for (const locale of LOCALES) {
+    for (const chunk of corpus(locale)) {
+      if (exempt(chunk.id)) continue;
+      for (const amount of NEURAWEB_PRICES) {
+        assert.ok(!chunk.body.includes(formatVnd(amount)), `${chunk.id} (${locale}) contient ${formatVnd(amount)}`);
+      }
+    }
+  }
+});
+
+test("corpus : le montant des frais de déploiement n'est plus écrit dans l'extrait « non inclus »", () => {
+  for (const locale of LOCALES) {
+    const body = corpus(locale).find((c) => c.id === "non-inclus")!.body;
+    assert.ok(!body.includes("1.300.000"), `frais de déploiement chiffrés (${locale})`);
+    assert.ok(body.includes("/packs") || body.includes(`/${locale}/packs`), `renvoi vers la page absent (${locale})`);
+  }
 });

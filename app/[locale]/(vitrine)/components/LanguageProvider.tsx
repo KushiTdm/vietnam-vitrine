@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import NextLink, { type LinkProps } from "next/link";
 import type { AnchorHTMLAttributes, ReactNode } from "react";
 import type { L10n, Locale } from "@/lib/registry";
@@ -50,17 +50,21 @@ export default function LanguageProvider({
   locale: Locale;
   children: ReactNode;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
 
   const value = useMemo<Ctx>(
     () => ({
       locale,
-      setLocale: (l: Locale) => router.push(localizeHref(stripLocalePrefix(pathname), l)),
+      // Chargement complet, pas `router.push` : `[locale]` est le layout racine, une
+      // navigation douce entre deux langues le recrée, et avec lui le <script> d'amorce de
+      // `ScrollFx` — React signale alors « Encountered a script tag while rendering React
+      // component » (avertissement de développement, sans effet, mais bruyant). Un
+      // rechargement est le comportement normal d'un changement de langue de toute façon.
+      setLocale: (l: Locale) => window.location.assign(localizeHref(stripLocalePrefix(pathname), l)),
       tr: (v: L10n) => v[locale] ?? v.vi,
       t: (k: string) => UI[locale][k] ?? UI.vi[k] ?? k,
     }),
-    [locale, pathname, router],
+    [locale, pathname],
   );
 
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;

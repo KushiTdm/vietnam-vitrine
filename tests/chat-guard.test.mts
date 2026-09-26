@@ -14,7 +14,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { detectAbuse, namesForbiddenProvider, normalize, scrubResponse } from "../lib/chat/guard.ts";
+import { amountsNotIn, detectAbuse, namesForbiddenProvider, normalize, scrubResponse } from "../lib/chat/guard.ts";
 
 const HINT = "le bouton de contact de la page";
 
@@ -197,4 +197,43 @@ test("prestataires : une réponse normale n'est pas bloquée", () => {
   ]) {
     assert.equal(namesForbiddenProvider(text), null, `faux positif : ${text}`);
   }
+});
+
+// ────────────────────────────────────────────────────────────
+// Montants inventés : la réponse ne peut citer qu'un montant présent dans les extraits
+// ────────────────────────────────────────────────────────────
+
+const EXTRAITS =
+  "Tên miền khoảng 300.000₫/năm. Hạ tầng từ ~5 USD/tháng. Phí mở dịch vụ 50 USD (~1.300.000₫). Đặt cọc 50%. Trả lời 24/7. Làm trong 2–3 tuần.";
+
+test("amountsNotIn : un prix de pack ou de prestation dans la réponse est refusé", () => {
+  const refused = [
+    "Chatbot từ 19,9 triệu đồng/tháng",
+    "Giá từ 19.900.000₫ (~$783) trả một lần, cộng 990.000₫ mỗi tháng",
+    "Khởi Đầu chỉ 4,9M nhé",
+    "Gói này 29.900.000₫ một lần",
+    "It costs $39 per month",
+    "Ça coûte 1 490 € par an",
+  ];
+  for (const answer of refused) assert.ok(amountsNotIn(answer, EXTRAITS).length > 0, `laissé passer : « ${answer} »`);
+});
+
+test("amountsNotIn : un montant qui figure dans les extraits passe, tel qu'écrit", () => {
+  const accepted = [
+    "Tên miền khoảng 300.000₫/năm, do anh/chị tự mua",
+    "Hạ tầng từ 5 USD/tháng",
+    "Phí mở dịch vụ 50 USD, khoảng 1.300.000₫",
+  ];
+  for (const answer of accepted) assert.deepEqual(amountsNotIn(answer, EXTRAITS), [], `refusé à tort : « ${answer} »`);
+});
+
+test("amountsNotIn : ce qui n'est pas un montant passe (24/7, durées, pourcentages, « đ » lettre)", () => {
+  const accepted = [
+    "Trả lời 24/7, làm trong 2–3 tuần, đặt cọc 50% để bắt đầu",
+    "Anh/chị đã tích 2 điểm, đến quán lúc 15 phút",
+    "Mình có 3 đề xuất và 12 khách quen",
+    "Giá xem ở trang /packs, chưa gồm phí triển khai và tên miền",
+    "Je te propose 3 formules, à voir sur /fr/packs",
+  ];
+  for (const answer of accepted) assert.deepEqual(amountsNotIn(answer, EXTRAITS), [], `refusé à tort : « ${answer} »`);
 });
