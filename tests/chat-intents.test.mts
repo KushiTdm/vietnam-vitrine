@@ -1,5 +1,5 @@
 /**
- * Tests des deux raccourcis qui répondent sans appeler le modèle.
+ * Tests des trois raccourcis qui répondent sans appeler le modèle (contact, rendez-vous, site offert).
  *
  *   cd apps/vitrine && tsx --test tests/*.test.mts
  *
@@ -11,7 +11,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { isBookingRequest, isContactRequest } from "../lib/chat/intents.ts";
+import { isBookingRequest, isContactRequest, isGiftRequest } from "../lib/chat/intents.ts";
 
 test("contact : une vraie demande de coordonnées est reconnue", () => {
   for (const [q, l] of [
@@ -57,5 +57,48 @@ test("rendez-vous : une question de prix n'ouvre pas le calendrier", () => {
     ["gói Phát Triển giá bao nhiêu", "vi"],
   ] as const) {
     assert.equal(isBookingRequest(q, l), false, `faux positif : ${q}`);
+  }
+});
+
+test("site offert : une question sur l'opération est reconnue", () => {
+  for (const [q, l] of [
+    ["chương trình tặng web là gì?", "vi"],
+    ["Trang web được tặng trị giá bao nhiêu?", "vi"],
+    ["phí mở dịch vụ là bao nhiêu", "vi"],
+    ["moi tuan mot trang la gi vay", "vi"],
+    ["làm sao để nhận website miễn phí", "vi"],
+    ["How does the free website giveaway work?", "en"],
+    ["Is the free website really free?", "en"],
+    ["how do I win a website", "en"],
+    ["Comment gagner un site ?", "fr"],
+    ["Le site offert est-il vraiment gratuit ?", "fr"],
+    ["Le jeu concours, c'est quoi ?", "fr"],
+    ["l'opération un site par semaine", "fr"],
+  ] as const) {
+    assert.ok(isGiftRequest(q, l), `manqué : ${q}`);
+  }
+});
+
+test("site offert : une question de vente ne renvoie PAS vers le jeu", () => {
+  // Le piège du vietnamien : « tăng » (augmenter) et « tặng » (offrir) sont identiques sans accents.
+  for (const [q, l] of [
+    ["Tôi muốn tăng website lên top Google", "vi"],
+    ["làm sao để tăng web traffic", "vi"],
+    ["khách được tặng điểm thưởng khi quét mã", "vi"],
+    ["bên anh tư vấn miễn phí không?", "vi"],
+    ["khi nào tôi nhận trang web", "vi"],
+    ["tên miền miễn phí không?", "vi"],
+    ["Gói Phát Triển giá bao nhiêu?", "vi"],
+    ["Do you offer a free consultation?", "en"],
+    ["Do you do a free site audit?", "en"],
+    ["what is the deployment fee?", "en"],
+    ["is there a setup fee for the Business pack?", "en"],
+    ["Can I get a website built in a week?", "en"],
+    ["Vous faites un devis gratuit ?", "fr"],
+    ["Y a-t-il des frais de mise en service sur le pack Business ?", "fr"],
+    ["mon salon organise un concours photo, je veux une page pour ça", "fr"],
+    ["Combien de temps pour avoir mon site ?", "fr"],
+  ] as const) {
+    assert.equal(isGiftRequest(q, l), false, `faux positif : ${q}`);
   }
 });

@@ -6,3 +6,7 @@ out/
 .env.local
 .env*.local
 .DS_Store
+
+# Clés service account Google (indexation) et logs d erreurs
+scripts/service-account.json
+scripts/indexing-errors-*.json

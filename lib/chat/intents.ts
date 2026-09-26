@@ -1,6 +1,7 @@
 /**
- * Détection d'intention — les deux raccourcis qui répondent sans appeler le
- * modèle : « donnez-moi vos coordonnées » et « je veux un rendez-vous ».
+ * Détection d'intention — les trois raccourcis qui répondent sans appeler le
+ * modèle : « donnez-moi vos coordonnées », « je veux un rendez-vous » et une
+ * question sur le site offert (opération « un site par semaine »).
  *
  * Sorti de la route pour être testable : c'est de la logique métier, pas de
  * la plomberie HTTP, et une liste de mots-clés trop large coûte cher. Zalo en
@@ -63,6 +64,45 @@ const BOOKING_TRIGGERS: Record<Locale, string[]> = {
   ],
 };
 
+/**
+ * Questions sur le site offert. Le chatbot n'en répond pas : il renvoie vers la page de
+ * l'offre (`/qua-tang`), où le règlement, les frais à la charge du gagnant et la valeur sont
+ * écrits une fois pour toutes. Un petit modèle se trompait sur le fond — « aucun frais » pour
+ * un site dont le gagnant règle des frais de mise en service.
+ *
+ * Même règle de rédaction que les listes ci-dessus : une INTENTION, pas un mot isolé. Ont été
+ * écartés, parce qu'ils attrapaient des questions de vente : « được tặng » seul (les points
+ * d'une carte de fidélité), « miễn phí » seul (une consultation gratuite), « free site »
+ * (un audit gratuit), « concours » seul (un concours photo dans un salon), et « frais de mise
+ * en service » / « setup fee » (qu'un visiteur dit pour les frais de déploiement d'un pack).
+ */
+const GIFT_TRIGGERS: Record<Locale, string[]> = {
+  vi: [
+    "web mien phi", "website mien phi", "trang web mien phi", "moi tuan mot trang",
+    "phi mo dich vu", "giveaway", "chuong trinh tang web", "chuong trinh tang website",
+    "chuong trinh tang trang",
+  ],
+  en: [
+    "free website", "free web page", "free webpage", "website giveaway", "giveaway",
+    "win a website", "win the website", "win a site", "site a week", "website a week",
+    "site per week", "website per week", "page a week", "page per week",
+  ],
+  fr: [
+    "site offert", "site gratuit", "page offerte", "page gratuite", "site par semaine",
+    "operation un site", "jeu concours", "gagner un site", "gagner le site", "gagner une page",
+  ],
+};
+
+/**
+ * Vietnamien : « tặng » (offrir) et « tăng » (augmenter) deviennent le même mot une fois les
+ * accents retirés, comme le fait `normalize`. « tôi muốn tăng website lên top Google » ne doit
+ * pas renvoyer vers le jeu : ces déclencheurs se comparent donc AVEC leurs accents.
+ */
+const GIFT_TRIGGERS_VI_EXACT = [
+  "chương trình tặng", "tặng web", "tặng website", "tặng trang web",
+  "trang được tặng", "web được tặng", "website được tặng",
+];
+
 function matches(message: string, triggers: string[]): boolean {
   const msg = normalize(message);
   return triggers.some((k) => msg.includes(normalize(k)));
@@ -74,4 +114,11 @@ export function isContactRequest(message: string, locale: Locale): boolean {
 
 export function isBookingRequest(message: string, locale: Locale): boolean {
   return matches(message, BOOKING_TRIGGERS[locale]);
+}
+
+export function isGiftRequest(message: string, locale: Locale): boolean {
+  if (matches(message, GIFT_TRIGGERS[locale])) return true;
+  if (locale !== "vi") return false;
+  const raw = message.toLowerCase();
+  return GIFT_TRIGGERS_VI_EXACT.some((trigger) => raw.includes(trigger));
 }

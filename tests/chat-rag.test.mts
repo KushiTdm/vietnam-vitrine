@@ -25,8 +25,9 @@ import { corpus } from "../lib/chat/kb/corpus.ts";
 import { FAQ } from "../lib/chat/kb/faq.ts";
 import { search, withPackCoherence } from "../lib/chat/retrieval.ts";
 import { buildSystemPrompt } from "../lib/chat/context.ts";
+import { amountsNotIn } from "../lib/chat/guard.ts";
 import { ABOUT, SERVICES } from "../lib/registry/services.ts";
-import { ENTERPRISE_FLOOR, PACKS } from "../lib/registry/packs.ts";
+import { ENTERPRISE_FLOOR, NOT_INCLUDED, OPTIONS, PACKS } from "../lib/registry/packs.ts";
 import { formatVnd } from "../lib/registry/format.ts";
 import type { Locale } from "../lib/registry/types.ts";
 
@@ -168,6 +169,10 @@ const CASES: { q: string; locale: Locale; expect: string[] }[] = [
   { q: "je perds une heure par jour à recopier mes commandes", locale: "fr", expect: ["service:automatisation"] },
   { q: "can you connect my orders to KiotViet?", locale: "en", expect: ["service:automatisation"] },
   { q: "je veux un chatbot IA sur mon site", locale: "fr", expect: ["service:ia"] },
+  // L'échange de 15 minutes est gratuit et sans engagement (confirmé le 26 sept. 2026).
+  { q: "Bên anh tư vấn miễn phí không?", locale: "vi", expect: ["faq:echange-gratuit"] },
+  { q: "Is the first consultation free?", locale: "en", expect: ["faq:echange-gratuit"] },
+  { q: "Le premier échange est gratuit ?", locale: "fr", expect: ["faq:echange-gratuit"] },
   { q: "tôi muốn trợ lý AI trả lời khách trên Zalo", locale: "vi", expect: ["service:ia"] },
 ];
 
@@ -409,23 +414,53 @@ test("corpus : la FAQ de chaque prestation est lue par l'assistant, mot pour mot
   }
 });
 
-test("corpus : aucun prix de pack, d'option ou de prestation nulle part dans ce que lit le chatbot", () => {
-  // Le garde-fou ne vaut que si les extraits ne portent plus de prix de Neuraweb : un montant
-  // présent dans un extrait serait « autorisé » dans la réponse. Sont exclus, parce qu'ils
-  // portent légitimement des montants : l'opération « un site par semaine » (frais de 50 USD)
-  // et les estimations de tiers (nom de domaine, infrastructure).
+test("corpus : le chatbot ne lit AUCUN montant, hors coûts payés à des tiers (domaine, hébergement, Google Play)", () => {
+  // Décision du 26 sept. 2026 : le chatbot ne cite plus les prix de Neuraweb — packs, options,
+  // tarif horaire des modifications, frais de déploiement, prestations, opération « un site par
+  // semaine » — il renvoie vers la page. Le garde-fou de sortie (`amountsNotIn`) n'autorise un
+  // montant que s'il figure dans un extrait : les extraits ne doivent donc en porter aucun,
+  // sauf ces coûts qui ne sont pas les nôtres. Une première version de ce test n'excluait que
+  // les prix des packs : les 500.000₫/h des modifications et les montants du jeu étaient passés.
+  const THIRD_PARTY = new Set([
+    "non-inclus", // nom de domaine, infrastructure : estimations de fournisseurs tiers
+    "faq:domaine",
+    "faq:hebergement",
+    "tech:donnees",
+    "service:mobile", // compte Google Play (25 USD, payé à Google), serveur
+    "jeu:conditions", // la ligne du nom de domaine acheté par le gagnant
+  ]);
+  for (const locale of LOCALES) {
+    for (const chunk of corpus(locale)) {
+      if (THIRD_PARTY.has(chunk.id)) continue;
+      assert.deepEqual(amountsNotIn(`${chunk.title}\n${chunk.body}`, ""), [], `${chunk.id} (${locale}) porte un montant`);
+    }
+  }
+});
+
+test("corpus : aucun prix de Neuraweb, même dans les extraits de coûts de tiers", () => {
   const NEURAWEB_PRICES = [
     ...PACKS.flatMap((p) => [p.price, p.priceWithMaintenance, p.monthly, p.yearlyMaintenance]),
     ENTERPRISE_FLOOR,
     ...SERVICES.flatMap((s) => s.tiers.flatMap((t) => [t.floor, t.monthly])),
+    ...OPTIONS.flatMap((o) => [o.price, ...Object.values(o.priceByPack ?? {})]),
+    NOT_INCLUDED.find((i) => i.id === "deploiement")!.amount, // frais de déploiement = frais du jeu (~1,3 M₫)
+    500_000, // tarif horaire des modifications
   ].filter((n): n is number => typeof n === "number" && n > 0);
-  const exempt = (id: string) => id.startsWith("gift") || id.startsWith("jeu") || id === "non-inclus" || id.startsWith("faq:") || id === "tech" || id.startsWith("tech:");
   for (const locale of LOCALES) {
     for (const chunk of corpus(locale)) {
-      if (exempt(chunk.id)) continue;
       for (const amount of NEURAWEB_PRICES) {
         assert.ok(!chunk.body.includes(formatVnd(amount)), `${chunk.id} (${locale}) contient ${formatVnd(amount)}`);
       }
+      assert.ok(!/\b50 USD\b/i.test(chunk.body), `${chunk.id} (${locale}) contient les 50 USD du jeu`);
+    }
+  }
+});
+
+test("corpus : le jeu renvoie vers sa page pour les montants", () => {
+  for (const locale of LOCALES) {
+    const page = locale === "vi" ? "/qua-tang" : `/${locale}/qua-tang`;
+    for (const id of ["jeu:conditions", "jeu:reglement"]) {
+      assert.ok(corpus(locale).find((c) => c.id === id)!.body.includes(page), `${id} (${locale}) sans renvoi vers ${page}`);
     }
   }
 });
@@ -436,4 +471,18 @@ test("corpus : le montant des frais de déploiement n'est plus écrit dans l'ext
     assert.ok(!body.includes("1.300.000"), `frais de déploiement chiffrés (${locale})`);
     assert.ok(body.includes("/packs") || body.includes(`/${locale}/packs`), `renvoi vers la page absent (${locale})`);
   }
+});
+
+test("FAQ : l'échange de 15 minutes est dit gratuit ET sans engagement, dans les trois langues", () => {
+  // Fait confirmé par Nacer : on protège la formulation contre une réécriture qui en perdrait un des deux.
+  const entry = FAQ.find((f) => f.id === "echange-gratuit");
+  assert.ok(entry, "entrée absente");
+  assert.match(entry.answer.vi, /miễn phí/);
+  assert.match(entry.answer.vi, /không có cam kết/);
+  assert.match(entry.answer.en, /free/);
+  assert.match(entry.answer.en, /no commitment/);
+  assert.match(entry.answer.fr, /gratuit/);
+  assert.match(entry.answer.fr, /sans aucun engagement/);
+  // Rien de plus que ce qui a été confirmé : le devis n'est pas déclaré gratuit.
+  for (const locale of LOCALES) assert.ok(!/quote is free|devis (est )?gratuit|báo giá (được )?miễn phí/i.test(entry.answer[locale]), `promesse en trop (${locale})`);
 });

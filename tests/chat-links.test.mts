@@ -94,3 +94,10 @@ test("withPricingLink : la réponse qui renvoie vers /packs reçoit le bouton de
   const four = ["a", "b", "c", "d"].map((x) => ({ label: x, href: `/${x}` }));
   assert.equal(withPricingLink(four, "voir /fr/packs", "fr").length, 4);
 });
+
+test("withPricingLink : la réponse qui renvoie vers /qua-tang reçoit le bouton du jeu", () => {
+  const out = withPricingLink([], "Le règlement est sur la page /fr/qua-tang.", "fr");
+  assert.equal(out.length, 1);
+  assert.equal(out[0].href, "/fr/qua-tang");
+  assert.equal(withPricingLink(out, "Le règlement est sur la page /fr/qua-tang.", "fr").length, 1, "bouton dupliqué");
+});

@@ -48,7 +48,7 @@ import {
   scrubResponse,
 } from "@/lib/chat/guard";
 import { getCached, setCached } from "@/lib/chat/cache";
-import { isBookingRequest, isContactRequest } from "@/lib/chat/intents";
+import { isBookingRequest, isContactRequest, isGiftRequest } from "@/lib/chat/intents";
 import { linksFor, withPricingLink } from "@/lib/chat/links";
 import { logChat, reportSecurityEvent, type ChatIntent } from "@/lib/chat/telemetry";
 
@@ -149,6 +149,10 @@ type Strings = {
   contactAnswer: string;
   /** Le modèle a cité un montant absent des extraits : on renvoie vers la page des tarifs. */
   priceRedirect: string;
+  /** Idem pour le jeu Facebook : les montants sont sur la page du règlement. */
+  giftRedirect: string;
+  /** Question sur le site offert : pas de réponse du modèle, la page de l'offre. */
+  giftAnswer: string;
   /** Modèle saturé : le widget bloque l'envoi et affiche ce décompte. */
   saturated: string;
   /** Intention de rendez-vous détectée : le widget ouvre le choix des créneaux. */
@@ -175,6 +179,10 @@ const T: Record<Locale, Strings> = {
       'Anh/chị bấm nút "Nhận báo giá" ở đầu trang hoặc "Nhắn Zalo" ở cuối trang là nhắn được ngay — mình trả lời trong ngày. Trước đó, anh/chị muốn mình tư vấn gói nào phù hợp không ạ?',
     priceRedirect:
       "Mình không nêu số tiền trong tin nhắn để tránh nhầm lẫn — giá đầy đủ và luôn cập nhật nằm ở trang Bảng giá: /packs (chưa gồm phí triển khai và tên miền). Với ứng dụng Android, tự động hóa và tích hợp AI, giá từng gói nằm ở trang riêng của từng dịch vụ.",
+    giftRedirect:
+      "Mình không nêu số tiền của chương trình tặng web trong tin nhắn để tránh nhầm lẫn — thể lệ đầy đủ và các khoản tự trả được ghi rõ ở trang /qua-tang.",
+    giftAnswer:
+      "Về chương trình tặng web, anh/chị xem trang riêng của chương trình nhé — ở đó ghi đầy đủ phần được tặng, cách tham gia, thể lệ và các khoản tự trả: /qua-tang. Mình không trả lời chi tiết ở đây để tránh nhầm lẫn.",
     saturated:
       "Trợ lý đang nhận quá nhiều câu hỏi cùng lúc. Anh/chị đợi {time} giây rồi gửi lại giúp mình nhé.",
     bookingIntro:
@@ -199,6 +207,10 @@ const T: Record<Locale, Strings> = {
       'Use the "Get a quote" button at the top of the page, or "Message on Zalo" at the bottom — we reply the same day. Before that, would you like help picking the right pack?',
     priceRedirect:
       "I don't quote amounts in chat, to avoid any mix-up — the full, always up-to-date prices are on the pricing page: /en/packs (deployment and domain name not included). For the Android app, automation and AI integration, the price of each tier is on that service's own page.",
+    giftRedirect:
+      "I don't quote the free-website programme's amounts in chat, to avoid any mix-up — the full terms and the costs you cover are set out on the /en/qua-tang page.",
+    giftAnswer:
+      "For the free-website programme, please see its own page — it sets out what is given, how to enter, the full terms and the costs you cover: /en/qua-tang. I don't answer the details here, to avoid any mix-up.",
     saturated:
       "The assistant is handling too many questions at once. Please try again in {time} seconds.",
     bookingIntro:
@@ -223,6 +235,10 @@ const T: Record<Locale, Strings> = {
       "Le bouton « Nhận báo giá » en haut de page, ou « Nhắn Zalo » en bas, permet de nous écrire directement — réponse dans la journée. Avant ça, je vous aide à choisir le pack ?",
     priceRedirect:
       "Je ne cite pas de montants dans la discussion, pour éviter toute confusion — les prix complets et à jour sont sur la page des tarifs : /fr/packs (frais de déploiement et nom de domaine non inclus). Pour l'application Android, l'automatisation et l'intégration d'IA, le prix de chaque formule est sur la page propre à chaque prestation.",
+    giftRedirect:
+      "Je ne cite pas les montants de l'opération dans la discussion, pour éviter toute confusion — le règlement complet et les frais à votre charge sont détaillés sur la page /fr/qua-tang.",
+    giftAnswer:
+      "Pour l'opération « un site par semaine », voyez sa page dédiée — elle détaille ce qui est offert, comment participer, le règlement complet et les frais à votre charge : /fr/qua-tang. Je ne réponds pas au détail ici, pour éviter toute confusion.",
     saturated:
       "L'assistant reçoit trop de questions en même temps. Réessayez dans {time} secondes.",
     bookingIntro:
@@ -382,6 +398,16 @@ export async function POST(request: NextRequest) {
       return reply(t.bookingIntro, "booking", { showBookingDates: true });
     }
 
+    // Question sur le site offert → la page de l'offre, pas une réponse : le règlement, la valeur
+    // et les frais à la charge du gagnant y sont écrits une fois pour toutes. Placé APRÈS le
+    // rendez-vous : « je voudrais un rendez-vous pour le site offert » reste une demande de créneau.
+    // L'intention enregistrée est « faq » : la colonne du journal n'a pas de valeur « gift ».
+    if (isGiftRequest(message, locale)) {
+      const href = locale === "vi" ? "/qua-tang" : `/${locale}/qua-tang`;
+      const label = { vi: "Chương trình tặng", en: "Free-website programme", fr: "Opération un site par semaine" }[locale];
+      return reply(t.giftAnswer, "faq", { links: [{ label, href }] });
+    }
+
     // Même question, même langue, premier tour : la réponse est déjà rédigée.
     const firstTurn = !Array.isArray(body.history) || body.history.length === 0;
     if (firstTurn) {
@@ -529,7 +555,8 @@ export async function POST(request: NextRequest) {
     const invented = amountsNotIn(answer, chunks.map((c) => `${c.title}\n${c.body}`).join("\n"));
     if (invented.length) {
       console.warn(`[chat] réponse remplacée : montant(s) absent(s) des extraits (${invented.join(", ")})`);
-      answer = t.priceRedirect;
+      // Un montant du jeu Facebook renvoie vers le règlement, pas vers la grille des packs.
+      answer = chunks.some((c) => c.topic === "jeu") ? t.giftRedirect : t.priceRedirect;
       intent = "faq";
     }
     // Le cache ne retient que les premiers tours : au-delà, la réponse dépend

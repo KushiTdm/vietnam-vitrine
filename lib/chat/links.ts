@@ -108,8 +108,15 @@ export function linksFor(chunks: Chunk[], locale: Locale): ChatLink[] {
  * que parle la réponse.
  */
 export function withPricingLink(links: ChatLink[], answer: string, locale: Locale): ChatLink[] {
-  const href = path("/packs", locale);
-  if (!answer.includes(href) || links.some((link) => link.href === href)) return links;
-  const label = { vi: "Bảng giá", en: "Pricing", fr: "Tarifs" }[locale];
-  return [{ label, href }, ...links].slice(0, MAX_LINKS);
+  const wanted = [
+    { href: path("/packs", locale), label: { vi: "Bảng giá", en: "Pricing", fr: "Tarifs" }[locale] },
+    {
+      href: path("/qua-tang", locale),
+      label: { vi: "Chương trình tặng", en: "Free-website programme", fr: "Opération un site par semaine" }[locale],
+    },
+  ];
+  const missing = wanted.filter(
+    (page) => answer.includes(page.href) && !links.some((link) => link.href === page.href),
+  );
+  return missing.length ? [...missing, ...links].slice(0, MAX_LINKS) : links;
 }

@@ -237,3 +237,11 @@ test("amountsNotIn : ce qui n'est pas un montant passe (24/7, durées, pourcenta
   ];
   for (const answer of accepted) assert.deepEqual(amountsNotIn(answer, EXTRAITS), [], `refusé à tort : « ${answer} »`);
 });
+
+test("scrubResponse : le marqueur interne [HS] n'atteint jamais le visiteur, où qu'il soit", () => {
+  for (const raw of ["[HS] Merci pour votre question.", "**[HS]** Merci pour votre question.", "Bonjour [HS]\nMerci pour votre question.", "\u00a0[HS] Merci pour votre question."]) {
+    const out = scrubResponse(raw, "contact");
+    assert.ok(!/\[HS\]/i.test(out), `[HS] resté dans : « ${out} »`);
+    assert.ok(out.includes("Merci pour votre question."), `texte perdu : « ${out} »`);
+  }
+});

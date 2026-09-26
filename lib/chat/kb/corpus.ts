@@ -36,6 +36,7 @@ import {
   formatVnd,
   tr,
   type FeatureValue,
+  type L10n,
   type Locale,
   type Pack,
   type PackId,
@@ -66,10 +67,47 @@ function money(n: number): string {
   return `${formatVnd(n)} (${approxUsd(n)})`;
 }
 
+/**
+ * Le tarif horaire des modifications (« 500.000₫/heure ») est un prix de Neuraweb : la page
+ * des tarifs, pas le chatbot. On garde le sens — facturé à l'heure sans entretien — et on
+ * retire le montant.
+ */
+const HOURLY_RATE: Record<Locale, [RegExp, string]> = {
+  vi: [/\d[\d.,]*₫\/giờ/g, "tính phí theo giờ"],
+  en: [/\d[\d.,]*₫\/hour started/g, "billed by the hour started"],
+  fr: [/\d[\d.,]*₫\/heure entamée/g, "facturées à l'heure entamée"],
+};
+
 function featureText(value: FeatureValue, locale: Locale): string | null {
   if (value === false) return null;
   if (value === true) return { vi: "Có", en: "Included", fr: "Inclus" }[locale];
-  return tr(value, locale);
+  const [pattern, replacement] = HOURLY_RATE[locale];
+  return tr(value, locale).replace(pattern, replacement);
+}
+
+/**
+ * Deux règles du jeu Facebook portent des montants (la valeur du site offert, les frais de
+ * mise en service). Le règlement complet, lui, est sur `/qua-tang` : le chatbot dit ce qui
+ * est offert et ce qui est à la charge du gagnant, et renvoie vers la page pour les chiffres.
+ */
+function giftRuleText(rule: { title: L10n; body: L10n }, locale: Locale): string | null {
+  const p = path("/qua-tang", locale);
+  switch (rule.title.vi) {
+    case "Phần được tặng":
+      return {
+        vi: `Thiết kế và lập trình một trang web, đúng phạm vi công bố ở trên, bàn giao trong 7 ngày kể từ khi nhận đủ nội dung. Giá trị của phần được tặng: xem trang ${p}, KHÔNG nêu số tiền.`,
+        en: `The design and build of a website matching the scope published above, delivered within 7 days of receiving all content. Value of what is given: see the ${p} page, do NOT state any amount.`,
+        fr: `La conception et le développement d'une page conforme au périmètre publié ci-dessus, livrée sous 7 jours à compter de la réception de l'intégralité du contenu. Valeur de ce qui est offert : voir la page ${p}, n'écris AUCUN montant.`,
+      }[locale];
+    case "Phần tự trả":
+      return {
+        vi: `Phí mở dịch vụ, trả một lần trước khi lên sóng, và tên miền do anh/chị tự mua, đứng tên anh/chị. Neuraweb không cầm tiền tên miền. Số tiền phí mở dịch vụ: xem trang ${p}, KHÔNG nêu số tiền.`,
+        en: `The setup fee, paid once before launch, and the domain name, bought by you, in your name. Neuraweb never handles the domain payment. Amount of the setup fee: see the ${p} page, do NOT state any amount.`,
+        fr: `Les frais de mise en service, payés une seule fois avant la mise en ligne, et le nom de domaine acheté par vous, à votre nom. Neuraweb n'encaisse jamais le prix du domaine. Montant des frais de mise en service : voir la page ${p}, n'écris AUCUN montant.`,
+      }[locale];
+    default:
+      return null;
+  }
 }
 
 const L = {
@@ -107,8 +145,10 @@ const L = {
     giftGate: "Điều kiện bắt buộc để được xét",
     giftRank: "Các hồ sơ hợp lệ được xếp hạng theo",
     giftPaid: "Cơ sở được chọn tự trả",
-    giftFee: "Phí mở dịch vụ 50 USD (~1.300.000₫), trả một lần, gồm",
+    giftFee: (p: string) => `Phí mở dịch vụ (số tiền: xem trang ${p}), trả một lần, gồm`,
+    paidOptionPage: (p: string) => `tùy chọn trả thêm — giá xem trang ${p}`,
     giftDomain: "Tên miền (~300.000₫/năm) do anh/chị tự mua, đứng tên anh/chị.",
+    giftNotFree: "LƯU Ý: chương trình KHÔNG hoàn toàn miễn phí. Cơ sở được chọn tự trả phí mở dịch vụ (một lần) và tự mua tên miền. KHÔNG bao giờ nói là không mất chi phí nào.",
     giftExcl: "Trang tặng CHƯA có (thuộc các gói trả phí)",
     week: "Tuần",
     sellPromise: "Được gì",
@@ -158,8 +198,10 @@ const L = {
     giftGate: "Requirement before any ranking",
     giftRank: "Valid entries are then ranked on",
     giftPaid: "The chosen business pays",
-    giftFee: "Setup fee of $50 (~1,300,000₫), one-off, covering",
+    giftFee: (p: string) => `Setup fee (amount: see the ${p} page), paid once, covering`,
+    paidOptionPage: (p: string) => `paid option — price on the ${p} page`,
     giftDomain: "The domain name (~300,000₫/year) is bought by you, in your name.",
+    giftNotFree: "NOTE: the programme is NOT entirely free. The chosen business pays a one-off setup fee and buys its own domain name. NEVER say there is no cost at all.",
     giftExcl: "The free page does NOT include (these belong to the paid packs)",
     week: "Week",
     sellPromise: "What it changes",
@@ -210,8 +252,10 @@ const L = {
     giftGate: "Prérequis avant tout classement",
     giftRank: "Les candidatures valides sont ensuite classées sur",
     giftPaid: "L'établissement choisi règle",
-    giftFee: "Frais de mise en service de 50 USD (~1.300.000₫), une seule fois, comprenant",
+    giftFee: (p: string) => `Frais de mise en service (montant : voir la page ${p}), payés une seule fois, comprenant`,
+    paidOptionPage: (p: string) => `option payante — prix sur la page ${p}`,
     giftDomain: "Le nom de domaine (~300.000₫/an) est acheté par vous, à votre nom.",
+    giftNotFree: "ATTENTION : l'opération n'est PAS entièrement gratuite. L'établissement choisi règle des frais de mise en service (une seule fois) et achète son nom de domaine. Ne dis JAMAIS qu'il n'y a aucun frais.",
     giftExcl: "La page offerte NE comprend PAS (ces éléments relèvent des packs payants)",
     week: "Semaine",
     sellPromise: "Ce que ça change",
@@ -569,7 +613,7 @@ function buildChunks(locale: Locale): Chunk[] {
     topic: "jeu",
     locale,
     title: l.giftWhat,
-    body: GIFTS.map((g) => `· ${tr(g.title, locale)} — ${tr(g.body, locale)}`).join("\n"),
+    body: [l.giftNotFree, ...GIFTS.map((g) => `· ${tr(g.title, locale)} — ${tr(g.body, locale)}`)].join("\n"),
     keywords: ["tang", "mien phi", "free", "gratuit", "offert", "qua tang", "jeu", "giveaway"],
     boost: 1.2,
   });
@@ -606,11 +650,18 @@ function buildChunks(locale: Locale): Chunk[] {
     locale,
     title: l.giftTerms,
     body: [
+      l.giftNotFree,
       `${l.giftPaid} :`,
-      `${l.giftFee} : ${SERVICE_FEE_ITEMS.map((i) => tr(i, locale)).join(" · ")}`,
+      `${l.giftFee(path("/qua-tang", locale))} : ${SERVICE_FEE_ITEMS.map((i) => tr(i, locale)).join(" · ")}`,
       l.giftDomain,
       `${l.giftExcl} : ${EXCLUSIONS.map((e) => {
-        const where = "pack" in e.where ? tr(e.where.pack.gridName, locale) : e.where.text;
+        // « +1.500.000₫ », « +6.900.000₫ » : des prix d'options, donc la page des tarifs.
+        const where =
+          "pack" in e.where
+            ? tr(e.where.pack.gridName, locale)
+            : /\d/.test(e.where.text)
+              ? l.paidOptionPage(path("/packs", locale))
+              : e.where.text;
         return `${tr(e.what, locale)} (→ ${where})`;
       }).join(" · ")}`,
     ].join("\n"),
@@ -622,7 +673,7 @@ function buildChunks(locale: Locale): Chunk[] {
     topic: "jeu",
     locale,
     title: l.giftRules,
-    body: RULES.map((r) => `${tr(r.title, locale)} : ${tr(r.body, locale)}`).join("\n"),
+    body: RULES.map((r) => `${tr(r.title, locale)} : ${giftRuleText(r, locale) ?? tr(r.body, locale)}`).join("\n"),
     keywords: ["the le", "reglement", "rules", "terms", "facebook", "meta", "du lieu", "donnees"],
   });
 

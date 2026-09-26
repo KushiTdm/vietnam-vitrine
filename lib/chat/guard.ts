@@ -338,7 +338,10 @@ const ALLOWED_PATH = /^\/(?:(?:en|fr)\/)?(?:packs|qua-tang|metiers(?:\/[\w-]+){0
  * monétaire.
  */
 export function scrubResponse(text: string, contactHint: string): string {
-  let out = text.replace(EMAIL, contactHint);
+  // Le marqueur « hors sujet » est un signal interne ; la route ne le retire que s'il ouvre la
+  // réponse. Un modèle qui le précède d'un espace insécable, d'un ** ou d'un mot le laissait
+  // à l'écran (« [HS] Merci pour votre question… »). Il ne doit apparaître nulle part.
+  let out = text.replace(/\[HS\]\s*/gi, "").replace(EMAIL, contactHint);
 
   // Le modèle invente des domaines (« https://neuraweb.com/packs ») même quand
   // le prompt le lui interdit. Un lien markdown interne est réduit à son
@@ -419,8 +422,9 @@ export function namesForbiddenProvider(text: string): string | null {
  * Règle : un montant d'argent dans la réponse doit figurer, chiffre pour chiffre, dans
  * l'un des extraits fournis au modèle pour ce tour. Sinon il vient d'ailleurs — de sa
  * mémoire ou de son imagination — et la réponse est refusée. Les seuls montants encore
- * présents dans les extraits sont des estimations de tiers (domaine, infrastructure) et
- * ceux de l'opération « un site par semaine » : ils passent, tels qu'écrits.
+ * présents dans les extraits sont des estimations de tiers (nom de domaine, infrastructure,
+ * compte Google Play) : ils passent, tels qu'écrits. Les montants du jeu Facebook n'y sont
+ * plus non plus : le règlement complet est sur `/qua-tang`.
  *
  * Un montant = un nombre suivi d'une unité monétaire (₫, đ, VND, USD, $, €, triệu,
  * nghìn, k, M…), ou précédé de $ / €. « 24/7 », « 15 phút », « 50 % », « 2–3 tuần » n'en

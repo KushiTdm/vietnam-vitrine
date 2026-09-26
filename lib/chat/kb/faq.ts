@@ -70,6 +70,29 @@ export const FAQ: FaqEntry[] = [
     keywords: ["bao lau", "delai", "lead time", "how long", "nhanh", "urgent", "combien de temps"],
   },
   {
+    // Confirmé par Nacer le 26 sept. 2026 : l'échange de 15 minutes est gratuit et sans engagement.
+    // On n'en dit RIEN de plus (en particulier pas que le devis est gratuit) : la question n'a été
+    // tranchée que pour l'échange. La réponse ne commence PAS par « Oui » : la recherche peut la servir
+    // à « faire un site coûte-t-il de l'argent ? », et un « Oui » y serait faux. Avant cette entrée, le modèle répondait « le conseil n'est pas
+    // gratuit », par invention, et sur un ton sec.
+    id: "echange-gratuit",
+    question: {
+      vi: "Buổi trao đổi 15 phút có miễn phí không?",
+      en: "Is the 15-minute call free?",
+      fr: "L'échange de 15 minutes est-il gratuit ?",
+    },
+    answer: {
+      vi: "Buổi trao đổi 15 phút là miễn phí và không có cam kết nào — nghe xong thấy chưa phù hợp thì anh/chị cứ dừng ở đó. Sau buổi trao đổi, giá chính xác được chốt theo phạm vi công việc. Anh/chị có thể đặt lịch ngay trong khung chat này hoặc bấm nút liên hệ trên trang.",
+      en: "The 15-minute call is free and carries no commitment — if it isn't a fit, you simply stop there. After the call, the exact price is set according to the scope of the work. You can book a slot right here in this chat, or use the contact button on the page.",
+      fr: "L'échange de 15 minutes est gratuit et sans aucun engagement — s'il ne vous convient pas, vous vous arrêtez là. À l'issue de l'échange, le montant exact se fixe selon le périmètre du travail. Vous pouvez réserver un créneau ici, dans cette discussion, ou utiliser le bouton de contact de la page.",
+    },
+    keywords: [
+      "tu van mien phi", "tu van co mat phi", "trao doi mien phi", "buoi trao doi", "15 phut", "khong cam ket",
+      "free consultation", "free call", "free meeting", "free chat", "15 minute call", "no commitment", "no obligation",
+      "conseil gratuit", "echange gratuit", "consultation gratuite", "appel gratuit", "premier echange", "sans engagement", "15 minutes",
+    ],
+  },
+  {
     id: "contenu-a-fournir",
     question: {
       vi: "Tôi cần chuẩn bị gì?",

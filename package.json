@@ -9,7 +9,9 @@
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.mts",
-    "rag:embeddings": "tsx scripts/build-embeddings.mts"
+    "rag:embeddings": "tsx scripts/build-embeddings.mts",
+    "indexing": "node scripts/indexing.js",
+    "indexing:dry": "node scripts/indexing.js --dry-run"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
